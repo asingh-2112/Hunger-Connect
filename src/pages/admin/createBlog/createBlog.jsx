@@ -1,0 +1,7 @@
+import React from 'react'
+
+export default function createBlog() {
+  return (
+    <div>createBlog</div>
+  )
+}
