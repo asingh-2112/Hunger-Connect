@@ -1,14 +1,18 @@
-import React from 'react'
-import { Route, Router, Routes } from 'react-router-dom'
-import Home from './pages/home/Home'
-import AllBlogs from './pages/allBlogs/AllBlogs'
-import Blog from './pages/blog/Blog'
-import BlogInfo from './pages/blogInfo/BlogInfo'
-import AdminLogin from './pages/admin/adminLogin/AdminLogin'
-import Dashboard from './pages/admin/dashboard/Dashboard'
-import Nopage from './pages/nopage/Nopage'
-import MyState from './context/data/myState'
-import { Toaster } from 'react-hot-toast'
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+} from "react-router-dom";
+import Home from './pages/home/Home';
+import AllBlogs from './pages/allBlogs/AllBlogs';
+import Blog from './pages/blog/Blog';
+import BlogInfo from './pages/blogInfo/BlogInfo';
+import AdminLogin from './pages/admin/adminLogin/AdminLogin';
+import Dashboard from './pages/admin/dashboard/Dashboard';
+import Nopage from './pages/nopage/Nopage';
+import MyState from './context/data/myState';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -22,7 +26,7 @@ function App() {
             <Route path="/bloginfo/:id" element={<BlogInfo/>} />
             <Route path="/adminlogin" element={<AdminLogin/>} />
             <Route path="/dashboard" element={<Dashboard/>} />
-            <Route path="/*" element={<Nopage/>} />
+            <Route path="/*" element={<Nopage />} />
           </Routes>
           <Toaster/>
         </Router>
