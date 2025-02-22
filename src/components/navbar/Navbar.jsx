@@ -12,6 +12,7 @@ import { AiOutlineShareAlt, AiOutlineSearch } from 'react-icons/ai'
 import myContext from "../../context/data/myContext";
 import SearchDialog from "../searchDialog/SearchDialog";
 import ShareDialogBox from "../shareDialogBox/ShareDialogBox";
+import logo from "../../assets/logo/logo.png";
 
 
 export default function Nav() {
@@ -79,13 +80,13 @@ export default function Nav() {
                         >
                             {/* Logo Image  */}
                             <img
-                                className=' w-10 h-10 '
-                                src='https://cdn-icons-png.flaticon.com/128/3685/3685253.png'
+                                className=' w-30 h-10 '
+                                src={logo}
                             />
                             {/* Logo Text  */}
-                            <span>
+                            {/* <span>
                                 HungerConnect
-                            </span>
+                            </span> */}
                         </Typography>
                     </Link>
 

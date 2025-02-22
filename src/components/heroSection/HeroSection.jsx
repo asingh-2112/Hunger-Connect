@@ -1,6 +1,8 @@
 import { Typography } from '@material-tailwind/react'
 import React, { useContext } from 'react'
 import myContext from '../../context/data/myContext';
+import logoSlogan from "../../assets/logo/logo_slogan.png";
+
 
 function HeroSection() {
     const context = useContext(myContext);
@@ -17,18 +19,21 @@ function HeroSection() {
                         <div className="mb-2">
                             {/* Image  */}
                             <div className="flex justify-center">
-                                <img src="https://cdn-icons-png.flaticon.com/128/3685/3685253.png" alt="" />
+                                <img 
+                                className='w-[600px] h-[100px]'
+                                src={logoSlogan} alt="" 
+                                />
                             </div>
 
                             {/* Text  */}
-                            <h1 className=' text-3xl text-white font-bold'>Devknus</h1>
+                            {/* <h1 className=' text-3xl text-white font-bold'>No Hunger</h1> */}
                         </div>
 
                         {/* Paragraph  */}
                         <p
                             style={{ color: mode === 'dark' ? 'white' : 'white' }}
                             className="sm:text-3xl text-xl font-extralight sm:mx-auto ">
-                            Here are some blogs and tutorials contributed by Devknus.
+                            Come together Food Provider and Distributor to Reduce Food Wastage
                         </p>
                     </div>
 
