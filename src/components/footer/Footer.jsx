@@ -13,7 +13,7 @@ function Footer() {
                 <div className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
                     {/* logo  */}
                     <img className='w-[200px]'
-                        src={logo} alt="logo"
+                        src="https://i.imgur.com/gEHDYl2.png" alt="logo"
                     />
                     {/* logo text  */}
                     {/* <span className="ml-3 text-xl text-white">

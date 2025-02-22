@@ -12,7 +12,6 @@ import { AiOutlineShareAlt, AiOutlineSearch } from 'react-icons/ai'
 import myContext from "../../context/data/myContext";
 import SearchDialog from "../searchDialog/SearchDialog";
 import ShareDialogBox from "../shareDialogBox/ShareDialogBox";
-import logo from "../../assets/logo/logo.png";
 
 
 export default function Nav() {
@@ -81,7 +80,8 @@ export default function Nav() {
                             {/* Logo Image  */}
                             <img
                                 className=' w-30 h-10 '
-                                src={logo}
+                                src="https://i.imgur.com/gEHDYl2.png"
+                                alt="logo"
                             />
                             {/* Logo Text  */}
                             {/* <span>

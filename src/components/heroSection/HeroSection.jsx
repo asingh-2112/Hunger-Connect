@@ -1,7 +1,6 @@
 import { Typography } from '@material-tailwind/react'
 import React, { useContext } from 'react'
 import myContext from '../../context/data/myContext';
-import logoSlogan from "../../assets/logo/logo_slogan.png";
 
 
 function HeroSection() {
@@ -21,7 +20,7 @@ function HeroSection() {
                             <div className="flex justify-center">
                                 <img 
                                 className='w-[600px] h-[100px]'
-                                src={logoSlogan} alt="" 
+                                src="https://i.imgur.com/8Zaotmf.png" alt="logo" 
                                 />
                             </div>
 
