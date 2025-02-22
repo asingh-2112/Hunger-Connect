@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 import myContext from '../../context/data/myContext';
-import logo from "../../assets/logo/logo.png";
 
 function Footer() {
     const context = useContext(myContext);

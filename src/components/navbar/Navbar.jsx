@@ -8,7 +8,6 @@ import {
 } from "@material-tailwind/react";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { AiOutlineShareAlt, AiOutlineSearch } from 'react-icons/ai'
 import myContext from "../../context/data/myContext";
 import SearchDialog from "../searchDialog/SearchDialog";
 import ShareDialogBox from "../shareDialogBox/ShareDialogBox";
@@ -54,9 +53,22 @@ export default function Nav() {
                 style={{ color: mode === 'dark' ? 'white' : 'white' }}
             >
                 <Link to={'/adminlogin'} className="flex items-center">
-                    Admin Login
+                    Login
                 </Link>
             </Typography>
+
+            {/* Register */}
+            {/* <Typography
+                as="li"
+                variant="small"
+                color="blue-gray"
+                className="p-1 font-normal"
+                style={{ color: mode === 'dark' ? 'white' : 'white' }}
+            >
+                <Link to={'/adminlogin'} className="flex items-center">
+                    Register
+                </Link>
+            </Typography> */}
         </ul>
     );
 
