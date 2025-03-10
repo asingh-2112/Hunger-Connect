@@ -4,21 +4,71 @@ import editor from '../../../components/textEditor/editor';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { BsFillArrowLeftCircleFill } from "react-icons/bs";
 import myContext from '../../../context/data/myContext';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
     Button,
     Typography,
 } from "@material-tailwind/react";
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import toast from 'react-hot-toast';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { fireDb, storage } from '../../../firebase/FirebaseConfig';
 function CreateBlog() {
     const context = useContext(myContext);
     const { mode } = context;
 
-    const [blogs, setBlogs] = useState('');
+    const [blogs, setBlogs] = useState({
+        title:'',
+        category:'',
+        content:'',
+        time: Timestamp.now(),
+    });
     const [thumbnail, setthumbnail] = useState();
 
     const [text, settext] = useState('');
     console.log("Value: ",);
     console.log("text: ", text);
+    const navigate=useNavigate()
+
+    const addPost=async ()=>{
+        if(blogs.title==="" || blogs.category==="" || blogs.content==="" || blogs.time===""){
+            return toast.error("All fileds are required");
+        }
+        uploadImage()
+    }
+
+    const uploadImage = () => {
+        if (!thumbnail) return;
+        const imageRef = ref(storage, `blogimage/${thumbnail.name}`);
+        uploadBytes(imageRef, thumbnail).then((snapshot) => {
+            getDownloadURL(snapshot.ref).then((url) => {
+                const productRef = collection(fireDb, "blogPost")
+                try {
+                    addDoc(productRef, {
+                        blogs,
+                        thumbnail: url,
+                        time: Timestamp.now(),
+                        date: new Date().toLocaleString(
+                            "en-US",
+                            {
+                                month: "short",
+                                day: "2-digit",
+                                year: "numeric",
+                            }
+                        )
+                    })
+                    navigate('/dashboard')
+                    toast.success('Post Added Successfully');
+
+
+                } catch (error) {
+                    toast.error(error)
+                    console.log(error)
+                }
+            });
+        });
+    }
+
 
     // Create markup function 
     function createMarkup(c) {
@@ -105,6 +155,8 @@ function CreateBlog() {
                                 : 'rgb(226, 232, 240)'
                         }}
                         name="title"
+                        value={blogs.title}
+                        onChange={(e)=> setBlogs({...blogs,title:e.target.value})}
                     />
                 </div>
 
@@ -123,14 +175,33 @@ function CreateBlog() {
                                 : 'rgb(226, 232, 240)'
                         }}
                         name="category"
+                        value={blogs.category}
+                        onChange={(e)=> setBlogs({...blogs,category:e.target.value})}
                     />
                 </div>
 
                 {/* Four Editor  */}
+                {/* Caption Input */}
+                <div className="mb-3">
+                    <textarea
+                        label="Enter your Caption"
+                        className={`shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 
+                        outline-none ${mode === 'dark' ? 'placeholder-black' : 'placeholder-black'}`}
+                        placeholder="Enter Your Caption"
+                        style={{
+                            background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)'
+                        }}
+                        name="caption"
+                        value={blogs.content}
+                        onChange={(e) => setBlogs({ ...blogs, content: e.target.value })}
+                    />
+                </div>
+
                 {/* <CKEditor/> */}
 
                 {/* Five Submit Button  */}
                 <Button className=" w-full mt-5"
+                onClick={addPost}
                     style={{
                         background: mode === 'dark'
                             ? 'rgb(226, 232, 240)'
