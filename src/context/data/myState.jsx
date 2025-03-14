@@ -35,7 +35,6 @@ function MyState(props) {
                 });
 
                 setGetAllBlog(blogArray)
-                console.log(blogArray)
                 setloading(false)
             });
             return () => data;

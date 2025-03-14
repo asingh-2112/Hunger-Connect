@@ -12,6 +12,7 @@ function CreateBlog() {
     const context = useContext(myContext);
     const { mode } = context;
 
+    const navigate = useNavigate();
     const [blogs, setBlogs] = useState({
         title: '',
         category: '',
@@ -19,51 +20,69 @@ function CreateBlog() {
         time: Timestamp.now(),
     });
     const [thumbnail, setThumbnail] = useState(null);
-    const navigate = useNavigate();
 
     const addPost = async () => {
-        if (!blogs.title || !blogs.category || !blogs.content) {
-            return toast.error("All fields are required");
+        if (blogs.title === "" || blogs.category === "" || blogs.content === "" || blogs.thumbnail === "") {
+            toast.error('Please Fill All Fields');
         }
-        if (thumbnail) {
-            uploadImage();
-        } else {
-            savePost(""); // Save without an image
-        }
-    };
+        // console.log(blogs.content)
+        uploadImage()
+    }
 
     const uploadImage = () => {
+        if (!thumbnail) return;
         const imageRef = ref(storage, `blogimage/${thumbnail.name}`);
         uploadBytes(imageRef, thumbnail).then((snapshot) => {
             getDownloadURL(snapshot.ref).then((url) => {
-                savePost(url); // Save with image URL
-            });
-        }).catch(error => {
-            toast.error("Image upload failed");
-            console.log(error);
-        });
-    };
+                const productRef = collection(fireDb, "blogPost")
+                try {
+                    addDoc(productRef, {
+                        blogs,
+                        thumbnail: url,
+                        time: Timestamp.now(),
+                        date: new Date().toLocaleString(
+                            "en-US",
+                            {
+                                month: "short",
+                                day: "2-digit",
+                                year: "numeric",
+                            }
+                        )
+                    })
+                    navigate('/dashboard')
+                    toast.success('Post Added Successfully');
 
-    const savePost = async (imageUrl) => {
-        const productRef = collection(fireDb, "blogPost");
-        try {
-            await addDoc(productRef, {
-                ...blogs,
-                thumbnail: imageUrl,
-                time: Timestamp.now(),
-                date: new Date().toLocaleString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                }),
+
+                } catch (error) {
+                    toast.error(error)
+                    console.log(error)
+                }
             });
-            navigate('/dashboard');
-            toast.success('Post Added Successfully');
-        } catch (error) {
-            toast.error(error.message);
-            console.log(error);
-        }
-    };
+        });
+    }
+
+    // const savePost = async (imageUrl) => {
+    //     const productRef = collection(fireDb, "blogPost");
+    //     try {
+    //         await addDoc(productRef, {
+    //             ...blogs,
+    //             thumbnail: imageUrl,
+    //             time: Timestamp.now(),
+    //             date: new Date().toLocaleString("en-US", {
+    //                 month: "short",
+    //                 day: "2-digit",
+    //                 year: "numeric",
+    //             }),
+    //         });
+    //         navigate('/dashboard');
+    //         toast.success('Post Added Successfully');
+    //     } catch (error) {
+    //         toast.error(error.message);
+    //         console.log(error);
+    //     }
+    // };
+
+    const [text, settext] = useState('');
 
     return (
         <div className='container mx-auto max-w-5xl py-6'>
@@ -88,8 +107,10 @@ function CreateBlog() {
                 <div className="mb-3">
                     {thumbnail && (
                         <img className="w-full rounded-md mb-3"
-                            src={URL.createObjectURL(thumbnail)}
-                            alt="thumbnail"
+                        src={thumbnail
+                            ? URL.createObjectURL(thumbnail)
+                            : ""}
+                        alt="thumbnail"
                         />
                     )}
                     <Typography variant="small" className="mb-2 font-semibold"
@@ -108,6 +129,7 @@ function CreateBlog() {
                     <input className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 outline-none"
                         placeholder="Enter Your Title"
                         style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
+                        name="title"
                         value={blogs.title}
                         onChange={(e) => setBlogs({ ...blogs, title: e.target.value })}
                     />
@@ -118,6 +140,7 @@ function CreateBlog() {
                     <input className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 outline-none"
                         placeholder="Enter Your Category"
                         style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
+                        name="category"
                         value={blogs.category}
                         onChange={(e) => setBlogs({ ...blogs, category: e.target.value })}
                     />
@@ -128,6 +151,7 @@ function CreateBlog() {
                     <textarea className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 outline-none"
                         placeholder="Enter Your Content"
                         style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
+                        name='content'
                         value={blogs.content}
                         onChange={(e) => setBlogs({ ...blogs, content: e.target.value })}
                     />

@@ -132,7 +132,7 @@ function Dashboard() {
                                     ?
                                     <>
                                         {getAllBlog.map((item, index) => {
-                                            const {thumbnail, date} = item;
+                                            const {thumbnail, date, id} = item;
                                             console.log(item)
                                             return (
                                                 <tbody>
