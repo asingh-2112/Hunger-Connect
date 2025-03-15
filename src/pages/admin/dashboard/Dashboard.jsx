@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
     const context = useContext(myContext);
-    const { mode, getAllBlog } = context;
+    const { mode, getAllBlog, deleteBlogs } = context;
     const navigate=useNavigate();
 
     console.log(getAllBlog)
@@ -160,7 +160,9 @@ function Dashboard() {
                                                             {date}
                                                         </td>
                                                         {/* Delete Blog  */}
-                                                        <td style={{ color: mode === 'dark' ? 'white' : 'black' }} className="px-6 py-4">
+                                                        <td 
+                                                        onClick={()=> deleteBlogs(id)}
+                                                        style={{ color: mode === 'dark' ? 'white' : 'black' }} className="px-6 py-4">
                                                             <button className=' px-4 py-1 rounded-lg text-white font-bold bg-red-500'>
                                                                 Delete
                                                             </button>
