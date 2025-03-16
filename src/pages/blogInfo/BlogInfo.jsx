@@ -97,7 +97,8 @@ function BlogInfo() {
   }
 
   useEffect(() => {
-    getcomment()
+    getcomment();
+    window.scrollTo(0, 0)
   }, []);
 
 

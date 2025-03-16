@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import myContext from '../../context/data/myContext';
 import Layout from '../../components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,10 @@ function AllBlogs() {
     const { mode, getAllBlog } = context;
 
     const navigate=useNavigate();
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return (
         <Layout>

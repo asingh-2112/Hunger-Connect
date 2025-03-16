@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { BsFillArrowLeftCircleFill } from "react-icons/bs";
 import myContext from '../../../context/data/myContext';
 import { Link, useNavigate } from "react-router-dom";
@@ -83,6 +83,10 @@ function CreateBlog() {
     // };
 
     const [text, settext] = useState('');
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return (
         <div className='container mx-auto max-w-5xl py-6'>
