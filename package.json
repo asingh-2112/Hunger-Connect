@@ -17,6 +17,7 @@
     "@tinymce/tinymce-react": "^6.0.0",
     "autoprefixer": "^10.4.20",
     "firebase": "^11.4.0",
+    "india-state-district": "^1.0.2",
     "postcss": "^8.5.3",
     "quill": "^2.0.3",
     "react": "^19.0.0",

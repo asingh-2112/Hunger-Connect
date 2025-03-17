@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import myContext from "../../../context/data/myContext";
-import PlusButton from "../../../components/plusButton/plusButton";
 import { FiLogOut, FiPlusCircle } from "react-icons/fi"; 
 import { FaPlus, FaUserCircle } from "react-icons/fa";
 
@@ -45,7 +44,7 @@ function DonorDashboard() {
                 }>
                     <FaUserCircle className="text-6xl text-gray-400 mb-4" />
                     <h1 className="font-bold text-2xl">Kamal Nayan Upadhyay</h1>
-                    <h2 className="text-lg text-gray-500">Food Donor</h2>
+                    <h2 className="text-lg text-gray-500">Food Provider(Donor): Type</h2>
                     <p className="text-sm text-gray-500">knupadhyay784@gmail.com</p>
                     <p className="text-sm text-gray-500"><strong>Total Blogs:</strong> 15</p>
                     

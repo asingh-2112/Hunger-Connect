@@ -1,19 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-    Card,
-    CardHeader,
-    CardBody,
-    Input,
-    Button,
-    Typography,
-} from "@material-tailwind/react";
 import myContext from "../../../context/data/myContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-// import { auth, db, doc, fireDb, getDoc } from "../../../firebase/FirebaseConfig";
 
 export default function AdminLogin() {
     const context = useContext(myContext);
@@ -47,9 +38,9 @@ export default function AdminLogin() {
                 // Redirect based on user role
                 if (userData.role === "admin") {
                     navigate('/dashboard');
-                } else if (userData.role === "donor") {
+                } else if (userData.role === "provider") {
                     navigate('/donor-dashboard');
-                } else if (userData.role === "ngo") {
+                } else if (userData.role === "distributor") {
                     navigate('/ngo-dashboard');
                 } else {
                     toast.error("Invalid role detected!");
@@ -69,82 +60,62 @@ export default function AdminLogin() {
     }, []);
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            {/* Card */}
-            <Card
-                className="w-full max-w-[24rem]"
-                style={{
-                    background: mode === 'dark'
-                        ? 'rgb(30, 41, 59)'
-                        : 'rgb(226, 232, 240)'
-                }}
-            >
-                {/* Card Header */}
-                <CardHeader
-                    color="blue"
-                    floated={false}
-                    shadow={false}
-                    className="m-0 grid place-items-center rounded-b-none py-8 px-4 text-center"
-                    style={{
-                        background: mode === 'dark'
-                            ? 'rgb(226, 232, 240)'
-                            : 'rgb(30, 41, 59)'
-                    }}
-                >
-                    <div className="mb-4 rounded-full border border-white/10 bg-white/10 p-2 text-white">
-                        <div className="flex justify-center">
-                            {/* Image */}
-                            <img src="https://cdn-icons-png.flaticon.com/128/727/727399.png" className="h-20 w-20" alt="Login Icon" />
-                        </div>
-                    </div>
+        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                {/* Heading */}
+                <h2 className="text-2xl font-semibold text-center mb-4">Login</h2>
 
-                    {/* Heading */}
-                    <Typography variant="h4" style={{
-                        color: mode === 'dark'
-                            ? 'rgb(30, 41, 59)'
-                            : 'rgb(226, 232, 240)'
-                    }}>
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                    <img 
+                        src="https://cdn-icons-png.flaticon.com/128/727/727399.png"
+                        alt="Login Icon"
+                        className="h-20 w-20"
+                    />
+                </div>
+
+                {/* Form */}
+                <form className="space-y-4">
+                    {/* Email Input */}
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    />
+
+                    {/* Password Input */}
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    />
+
+                    {/* Login Button */}
+                    <button
+                        type="button"
+                        onClick={login}
+                        className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+                    >
                         Login
-                    </Typography>
-                </CardHeader>
+                    </button>
 
-                {/* Card Body */}
-                <CardBody>
-                    <form className="flex flex-col gap-4">
-                        {/* Email Input */}
-                        <Input
-                            type="email"
-                            label="Email"
-                            name="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        
-                        {/* Password Input */}
-                        <Input
-                            type="password"
-                            label="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        
-                        {/* Login Button */}
-                        <Button
-                            onClick={login}
-                            style={{
-                                background: mode === 'dark'
-                                    ? 'rgb(226, 232, 240)'
-                                    : 'rgb(30, 41, 59)',
-                                color: mode === 'dark'
-                                    ? 'rgb(30, 41, 59)'
-                                    : 'rgb(226, 232, 240)'
-                            }}
+                    {/* Register Option */}
+                    <p className="text-center text-gray-600">
+                        Don't have an account?{" "}
+                        <button
+                            type="button"
+                            onClick={() => navigate('/register')}
+                            className="text-blue-500 hover:underline"
                         >
-                            Login
-                        </Button>
-                    </form>
-                </CardBody>
-            </Card>
+                            Register here
+                        </button>
+                    </p>
+                </form>
+            </div>
         </div>
     );
 }

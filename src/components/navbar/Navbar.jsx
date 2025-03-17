@@ -21,11 +21,11 @@ export default function Nav() {
     const userRole = storedUser?.role; // Get user role
     const avatarRedirectPath = userRole === "admin"
         ? "/dashboard"
-        : userRole === "donor"
+        : userRole === "provider"
         ? "/donor-dashboard"
-        : userRole === "ngo"
+        : userRole === "distributor"
         ? "/ngo-dashboard"
-        : "/";
+        : "/reg";
 
     // Navbar Links
     const navList = (
@@ -40,16 +40,14 @@ export default function Nav() {
                     Blogs
                 </Link>
             </Typography>
-            <Typography as="li" className="p-1 font-normal">
-                <Link to={'/adminlogin'} className="flex items-center" style={{ color: "white" }}>
-                    Login
-                </Link>
-            </Typography>
-            <Typography as="li" className="p-1 font-normal">
-                <Link to={'/register'} className="flex items-center" style={{ color: "white" }}>
-                    Register
-                </Link>
-            </Typography>
+            { (!storedUser || !userRole) &&(
+                <Typography as="li" className="p-1 font-normal">
+                    <Link to={'/adminlogin'} className="flex items-center" style={{ color: "white" }}>
+                        Sign In
+                    </Link>
+                </Typography>
+            )}
+
         </ul>
     );
 

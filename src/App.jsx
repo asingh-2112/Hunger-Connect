@@ -19,8 +19,8 @@ import DonorDashboard from './pages/donor/dashboard/DonorDashboard';  // Add don
 import NgoDashboard from './pages/ngo/dashboard/NgoDashboard'; // Add NGO dashboard
 import { auth, fireDb } from './firebase/FirebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
-import Login from './pages/login/Login';
 import Register from './pages/register/Register';
+import CreateDonation from './components/createDonation/CreateDonation';
 // import { auth, db, getDoc, doc } from './firebase'; 
 
 function App() {
@@ -34,8 +34,9 @@ function App() {
             <Route path="/allblogs" element={<AllBlogs />} />
             <Route path="/bloginfo/:id" element={<BlogInfo />} />
             <Route path="/adminlogin" element={<AdminLogin />} />
-            <Route path="/login" element={<Login />} />
+            {/* <Route path="/login" element={<Login />} /> */}
             <Route path="/register" element={<Register />} />
+            <Route path="/createdonation" element={<CreateDonation />} />
 
             {/* Role-based Protected Routes */}
             <Route path="/dashboard" element={
@@ -51,14 +52,14 @@ function App() {
 
             {/* Donor Dashboard */}
             <Route path="/donor-dashboard" element={
-              <ProtectedRoute allowedRoles={["donor"]}>
+              <ProtectedRoute allowedRoles={["providor"]}>
                 <DonorDashboard />
               </ProtectedRoute>
             } />
 
             {/* NGO Dashboard */}
             <Route path="/ngo-dashboard" element={
-              <ProtectedRoute allowedRoles={["ngo"]}>
+              <ProtectedRoute allowedRoles={["distributor"]}>
                 <NgoDashboard />
               </ProtectedRoute>
             } />
