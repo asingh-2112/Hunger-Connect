@@ -52,7 +52,7 @@ function App() {
 
             {/* Donor Dashboard */}
             <Route path="/donor-dashboard" element={
-              <ProtectedRoute allowedRoles={["providor"]}>
+              <ProtectedRoute allowedRoles={["provider"]}>
                 <DonorDashboard />
               </ProtectedRoute>
             } />

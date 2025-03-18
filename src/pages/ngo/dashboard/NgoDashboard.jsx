@@ -4,14 +4,15 @@ import { Button } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 import { fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import myContext from '../../../context/data/myContext';
-// import { auth, db, getDoc, doc } from "../../../firebase/FirebaseConfig";
+import myContext from "../../../context/data/myContext";
+import { FiLogOut, FiPlusCircle } from "react-icons/fi"; 
+import { FaPlus, FaUserCircle } from "react-icons/fa";
 
 function NgoDashboard() {
     const navigate = useNavigate();
     const [donations, setDonations] = useState([]);
     const context = useContext(myContext);
-    const { mode, getAllBlog, deleteBlogs } = context;
+    const { mode } = context;
 
     useEffect(() => {
         const fetchDonations = async () => {
@@ -35,100 +36,56 @@ function NgoDashboard() {
 
     return (
         <Layout>
-            <div className="py-10">
+            <div className="py-10 px-6 max-w-5xl mx-auto">
 
-                <div
-                    className="flex flex-wrap justify-start items-center lg:justify-center gap-2 lg:gap-10 px-4 lg:px-0 mb-8">
-                    <div className="left">
-                        <img
-                            className=" w-40 h-40  object-cover rounded-full border-2 border-pink-600 p-1"
-                            src={'https://cdn-icons-png.flaticon.com/128/3135/3135715.png'} alt="profile"
-                        />
-                    </div>
-                    <div className="right">
-                        <h1
-                            className='text-center font-bold text-2xl mb-2'
-                            style={{ color: mode === 'dark' ? 'white' : 'black' }}
-                        >
-                            Kamal Nayan Upadhyay
-                        </h1>
-                        <h2
-                            style={{ color: mode === 'dark' ? 'white' : 'black' }} className="font-semibold">
-                            <span>Role : </span>  Food Distributor
-                        </h2>
-                        <h2
-                            style={{ color: mode === 'dark' ? 'white' : 'black' }} className="font-semibold">
-                            Software Developer
-                        </h2>
-                        <h2
-                            style={{ color: mode === 'dark' ? 'white' : 'black' }} className="font-semibold">knupadhyay784@gmail.com
-                        </h2>
-                        <h2
-                            style={{ color: mode === 'dark' ? 'white' : 'black' }} className="font-semibold">
-                            <span>Total Blog : </span>  15
-                        </h2>
-
-                        <div className=" flex gap-2 mt-2">
-                            <Link to={'/createblog'}>
-                                <div className=" mb-2">
-                                    <Button
-                                        style={{
-                                            background: mode === 'dark'
-                                                ? 'rgb(226, 232, 240)'
-                                                : 'rgb(30, 41, 59)',
-                                            color: mode === 'dark'
-                                                ? 'black'
-                                                : 'white'
-                                        }}
-                                        className='px-8 py-2'
-                                    >
-                                        Create Blog
-                                    </Button>
-                                </div>
-                            </Link>
-                            <div className="mb-2">
-                                <Button
-                                    onClick={logout}
-                                    style={{
-                                        background: mode === 'dark'
-                                            ? 'rgb(226, 232, 240)'
-                                            : 'rgb(30, 41, 59)',
-                                        color: mode === 'dark'
-                                            ? 'black'
-                                            : 'white'
-                                    }}
-                                    className='px-8 py-2'
-                                >
-                                    Logout
-                                </Button>
-                            </div>
-                        </div>
+                {/* Profile Card */}
+                <div className={`rounded-xl shadow-lg p-6 flex flex-col items-center text-center
+                    ${mode === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`
+                }>
+                    <FaUserCircle className="text-6xl text-gray-400 mb-4" />
+                    <h1 className="font-bold text-2xl">Kamal Nayan Upadhyay</h1>
+                    <h2 className="text-lg text-gray-500">Food Distributor: Type</h2>
+                    <p className="text-sm text-gray-500">knupadhyay784@gmail.com</p>
+                    <p className="text-sm text-gray-500"><strong>Total Blogs:</strong> 15</p>
+                    
+                    {/* Action Buttons */}
+                    <div className="mt-4 flex gap-4">
+                        <Link to={"/createblog"}>
+                            <Button 
+                                className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-lg
+                                transition-all duration-300
+                                bg-blue-600 text-white hover:bg-blue-700"
+                            >
+                                <FiPlusCircle />
+                                Create Blog
+                            </Button>
+                        </Link>
+                        <Button 
+                            onClick={logout} 
+                            className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-lg
+                            transition-all duration-300
+                            bg-red-600 text-white hover:bg-red-700">
+                            <FiLogOut />
+                            Logout
+                        </Button>
                     </div>
                 </div>
-                {/* Line  */}
-                <hr className={`border-2
-                 ${mode === 'dark'
-                        ? 'border-gray-300'
-                        : 'border-gray-400'}`
-                }
-                />
 
-                {/* Table for Donations */}
-                <div className="container mx-auto px-4 max-w-7xl my-5">
-                    <div className="relative overflow-x-auto shadow-md sm:rounded-xl">
-                        <table
-                            className={`w-full border-2 shadow-md text-sm text-left
-            ${mode === 'dark' ? 'border-gray-700 text-gray-300' : 'border-gray-300 text-gray-700'}`}
-                        >
-                            <thead
-                                className={`text-xs 
-                ${mode === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-800'}`}
-                            >
+                {/* Divider Line */}
+                <hr className={`my-6 border-2 ${mode === 'dark' ? 'border-gray-600' : 'border-gray-300'}`} />
+
+                {/* Donations Table */}
+                <div className={`rounded-xl shadow-lg p-4 overflow-hidden
+                    ${mode === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+                    <h2 className="text-xl font-semibold mb-4">History</h2>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm border-collapse">
+                            <thead className={`${mode === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                 <tr>
-                                    <th className="px-6 py-3">S.No</th>
-                                    <th className="px-6 py-3">Donor</th>
-                                    <th className="px-6 py-3">Date</th>
-                                    <th className="px-6 py-3">Status</th>
+                                    <th className="px-6 py-3 text-left">S.No</th>
+                                    <th className="px-6 py-3 text-left">Donor</th>
+                                    <th className="px-6 py-3 text-left">Date</th>
+                                    <th className="px-6 py-3 text-left">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,8 +93,10 @@ function NgoDashboard() {
                                     donations.map((donation, index) => (
                                         <tr
                                             key={index}
-                                            className={`border-b
-                            ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
+                                            className={`border-b transition-all
+                                                ${mode === 'dark' 
+                                                    ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' 
+                                                    : 'border-gray-300 bg-white hover:bg-gray-100'}`}
                                         >
                                             <td className="px-6 py-4">{index + 1}.</td>
                                             <td className="px-6 py-4">{donation.donorName}</td>
@@ -147,7 +106,7 @@ function NgoDashboard() {
                                     ))
                                 ) : (
                                     <tr className={mode === 'dark' ? 'bg-gray-900' : 'bg-white'}>
-                                        <td colSpan="4" className="px-6 py-4 text-center">
+                                        <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
                                             No Donations Found
                                         </td>
                                     </tr>
@@ -157,13 +116,16 @@ function NgoDashboard() {
                     </div>
                 </div>
 
-
-                {/* Logout Button
-                <Button onClick={logout}
-                style={{ color: mode === 'dark' ? 'white' : 'black' }} 
-                className="px-8 py-2 bg-red-500 text-white text-center">
-                    Logout
-                </Button> */}
+                {/* Floating Plus Button */}
+                <div className="fixed bottom-8 right-8">
+                    <button 
+                        className="flex items-center justify-center w-14 h-14 rounded-full shadow-lg
+                        bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300"
+                        title="Add Donation"
+                    >
+                        <FaPlus className="text-2xl" />
+                    </button>
+                </div>
             </div>
         </Layout>
     );

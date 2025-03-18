@@ -3,10 +3,11 @@ import Layout from "../../../components/layout/Layout";
 import { Button } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 import { fireDb } from "../../../firebase/FirebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import myContext from "../../../context/data/myContext";
 import { FiLogOut, FiPlusCircle } from "react-icons/fi"; 
 import { FaPlus, FaUserCircle } from "react-icons/fa";
+import PlusButton from "../../../components/plusButton/plusButton";
 
 function DonorDashboard() {
     const navigate = useNavigate();
@@ -15,18 +16,19 @@ function DonorDashboard() {
     const { mode } = context;
 
     useEffect(() => {
-        const fetchDonations = async () => {
-            const storedUser = JSON.parse(localStorage.getItem("user"));
-            if (!storedUser) return navigate("/");
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser) return navigate("/");
 
-            const userRef = doc(fireDb, "users", storedUser.uid);
-            const userSnap = await getDoc(userRef);
+        const userRef = doc(fireDb, "users", storedUser.uid);
+
+        // ✅ Enable real-time updates using onSnapshot
+        const unsubscribe = onSnapshot(userRef, (userSnap) => {
             if (userSnap.exists()) {
                 setDonations(userSnap.data().donations || []);
             }
-        };
-        fetchDonations();
-        window.scrollTo(0, 0);
+        });
+
+        return () => unsubscribe(); // ✅ Cleanup Firestore listener when component unmounts
     }, [navigate]);
 
     const logout = () => {
@@ -37,14 +39,13 @@ function DonorDashboard() {
     return (
         <Layout>
             <div className="py-10 px-6 max-w-5xl mx-auto">
-
                 {/* Profile Card */}
                 <div className={`rounded-xl shadow-lg p-6 flex flex-col items-center text-center
-                    ${mode === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`
-                }>
+                    ${mode === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
+                >
                     <FaUserCircle className="text-6xl text-gray-400 mb-4" />
                     <h1 className="font-bold text-2xl">Kamal Nayan Upadhyay</h1>
-                    <h2 className="text-lg text-gray-500">Food Provider(Donor): Type</h2>
+                    <h2 className="text-lg text-gray-500">Food Provider(Donor)</h2>
                     <p className="text-sm text-gray-500">knupadhyay784@gmail.com</p>
                     <p className="text-sm text-gray-500"><strong>Total Blogs:</strong> 15</p>
                     
@@ -53,8 +54,7 @@ function DonorDashboard() {
                         <Link to={"/createblog"}>
                             <Button 
                                 className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-lg
-                                transition-all duration-300
-                                bg-blue-600 text-white hover:bg-blue-700"
+                                transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700"
                             >
                                 <FiPlusCircle />
                                 Create Blog
@@ -63,8 +63,7 @@ function DonorDashboard() {
                         <Button 
                             onClick={logout} 
                             className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-lg
-                            transition-all duration-300
-                            bg-red-600 text-white hover:bg-red-700"
+                            transition-all duration-300 bg-red-600 text-white hover:bg-red-700"
                         >
                             <FiLogOut />
                             Logout
@@ -84,8 +83,9 @@ function DonorDashboard() {
                             <thead className={`${mode === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                 <tr>
                                     <th className="px-6 py-3 text-left">S.No</th>
-                                    <th className="px-6 py-3 text-left">Donor</th>
+                                    <th className="px-6 py-3 text-left">Location</th>
                                     <th className="px-6 py-3 text-left">Date</th>
+                                    <th className="px-6 py-3 text-left">Time</th>
                                     <th className="px-6 py-3 text-left">Status</th>
                                 </tr>
                             </thead>
@@ -100,14 +100,15 @@ function DonorDashboard() {
                                                     : 'border-gray-300 bg-white hover:bg-gray-100'}`}
                                         >
                                             <td className="px-6 py-4">{index + 1}.</td>
-                                            <td className="px-6 py-4">{donation.donorName}</td>
-                                            <td className="px-6 py-4">{donation.date}</td>
-                                            <td className="px-6 py-4">{donation.status}</td>
+                                            <td className="px-6 py-4">{donation.location || "N/A"}</td>
+                                            <td className="px-6 py-4">{donation.date || "N/A"}</td>
+                                            <td className="px-6 py-4">{donation.time || "N/A"}</td>
+                                            <td className="px-6 py-4">{donation.status || "Pending"}</td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr className={mode === 'dark' ? 'bg-gray-900' : 'bg-white'}>
-                                        <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                                        <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                                             No Donations Found
                                         </td>
                                     </tr>
@@ -117,16 +118,7 @@ function DonorDashboard() {
                     </div>
                 </div>
 
-                {/* Floating Plus Button */}
-                <div className="fixed bottom-8 right-8">
-                    <button 
-                        className="flex items-center justify-center w-14 h-14 rounded-full shadow-lg
-                        bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300"
-                        title="Add Donation"
-                    >
-                        <FaPlus className="text-2xl" />
-                    </button>
-                </div>
+                <PlusButton/>
             </div>
         </Layout>
     );
