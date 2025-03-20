@@ -56,7 +56,7 @@ export default function Nav() {
             <Navbar
                 className="sticky inset-0 z-20 h-max max-w-full border-none rounded-none py-4 px-6 lg:px-8 lg:py-4 backdrop-blur-md bg-opacity-80"
                 style={{
-                    background: mode === 'dark' ? "rgba(30, 41, 59, 0.8)" : 'rgba(243, 244, 246,0.8)',
+                    background: mode === 'dark' ? "rgba(30, 41, 59, 0.8)" : '#30336b',
                     boxShadow: mode === 'dark' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
                 }}
             >
