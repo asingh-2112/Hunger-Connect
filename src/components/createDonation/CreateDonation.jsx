@@ -1,96 +1,31 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
 import { Dialog, DialogBody, Input, Button } from "@material-tailwind/react";
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { fireDb } from "../../firebase/FirebaseConfig";
 import toast from "react-hot-toast";
+import FoodPreferenceStep from "./steps/FoodPreferenceStep";
+import AddressDetailsStep from "./steps/AddressDetailsStep";
+import AdditionalDetailsStep from "./steps/AdditionalDetailsStep";
+import MessageStep from "./steps/MessageStep";
+
+// Constants
+const FOOD_TYPES = {
+    PACKED: "Packed",
+    COOKED: "Cooked",
+};
+
+const FOOD_PREFERENCES = {
+    VEG: "Veg",
+    NON_VEG: "Non-Veg",
+    BOTH: "Both",
+};
+
+// Helper functions
+const validatePincode = (pincode) => /^\d{6}$/.test(pincode);
+const validatePhoneNumber = (phone) => /^\d{10}$/.test(phone);
+const validateMessage = (message) => message.length <= 100;
 
 const CreateDonation = ({ open, setOpen }) => {
-    const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({
-        foodType: [],
-        vegNonVeg: "Veg",
-        quantity: "",
-        state: "",
-        district: "",
-        city: "",
-        street: "",
-        locality: "",
-        pincode: "",
-        phoneNumber: "",
-        alternatePhoneNumber: "",
-        date: "",
-        time: "",
-        status: "Pending",
-    });
-
-    useEffect(() => {
-        if (open) {
-            const today = new Date().toISOString().split("T")[0];
-            setFormData((prev) => ({ ...prev, date: today }));
-
-            const fetchUserData = async () => {
-                const storedUser = JSON.parse(localStorage.getItem("user"));
-                if (!storedUser) return;
-                try {
-                    const userRef = doc(fireDb, "users", storedUser.uid);
-                    const userSnap = await getDoc(userRef);
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        setFormData((prev) => ({
-                            ...prev,
-                            state: userData.state || "",
-                            district: userData.district || "",
-                            city: userData.city || "",
-                            street: userData.street || "",
-                            locality: userData.locality || "",
-                            pincode: userData.pinCode || "",
-                            phoneNumber: userData.phone || "",
-                            alternatePhoneNumber: userData.alternatePhoneNumber || "",
-                        }));
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                }
-            };
-
-            fetchUserData();
-        }
-    }, [open]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const handleMultiSelect = (value) => {
-        setFormData((prev) => {
-            const updatedFoodType = prev.foodType.includes(value)
-                ? prev.foodType.filter((item) => item !== value)
-                : [...prev.foodType, value];
-            return { ...prev, foodType: updatedFoodType };
-        });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (!storedUser) {
-            toast.error("User not found. Please log in again.");
-            return;
-        }
-        try {
-            const userRef = doc(fireDb, "users", storedUser.uid);
-            await updateDoc(userRef, {
-                donations: arrayUnion({ ...formData }),
-            });
-            toast.success("Donation added successfully!");
-            setOpen(false);
-            setStep(1);
-            setFormData({ foodType: [], vegNonVeg: "Veg",quantity:"", state: "", district: "", city: "", street: "", locality: "", pincode: "", phoneNumber: "", alternatePhoneNumber: "", date: "", time: "", status: "Pending" });
-        } catch (error) {
-            toast.error("Failed to add donation. Please try again.");
-        }
-    };
 
     const statesAndDistricts = {
         "Andhra Pradesh": ["Anantapur","Chittoor","East Godavari","Guntur","Kadapa","Krishna","Kurnool","Prakasam","Nellore","Srikakulam","Visakhapatnam","Vizianagaram","West Godavari"],
@@ -132,121 +67,221 @@ const CreateDonation = ({ open, setOpen }) => {
         "Puducherry":["Karaikal","Mahe","Puducherry","Yanam"]
       };
 
+
+    const [step, setStep] = useState(1);
+    const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({
+        foodType: [],
+        vegNonVeg: FOOD_PREFERENCES.VEG,
+        quantity: "",
+        state: "",
+        district: "",
+        city: "",
+        street: "",
+        locality: "",
+        pincode: "",
+        phoneNumber: "",
+        alternatePhoneNumber: "",
+        date: "",
+        time: "",
+        message: "",
+        status: "Pending",
+    });
+
+    // Fetch user data on open
+    useEffect(() => {
+        if (open) {
+            const today = new Date().toISOString().split("T")[0];
+            setFormData((prev) => ({ ...prev, date: today }));
+
+            const fetchUserData = async () => {
+                const storedUser = JSON.parse(localStorage.getItem("user"));
+                if (!storedUser) return;
+                try {
+                    const userRef = doc(fireDb, "users", storedUser.uid);
+                    const userSnap = await getDoc(userRef);
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        setFormData((prev) => ({
+                            ...prev,
+                            state: userData.state || "",
+                            district: userData.district || "",
+                            city: userData.city || "",
+                            street: userData.street || "",
+                            locality: userData.locality || "",
+                            pincode: userData.pinCode || "",
+                            phoneNumber: userData.phone || "",
+                            alternatePhoneNumber: userData.alternatePhoneNumber || "",
+                        }));
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            };
+
+            fetchUserData();
+        }
+    }, [open]);
+
+    // Single handler for all input changes
+    const handleInputChange = useCallback((e) => {
+        const { name, value, type, checked } = e.target;
+    
+        setFormData((prev) => {
+            if (type === "checkbox") {
+                return {
+                    ...prev,
+                    foodType: checked
+                        ? [...prev.foodType, value]
+                        : prev.foodType.filter((item) => item !== value),
+                };
+            } else {
+                return { ...prev, [name]: value };
+            }
+        });
+    
+        // Clear the error for the current field when the user starts typing
+        setErrors((prev) => ({ ...prev, [name]: "" }));
+    }, []);
+
+    // Validate current step
+    const validateStep = useCallback(() => {
+        const newErrors = {};
+    
+        switch (step) {
+            case 1:
+                // No validation for step 1
+                break;
+            case 2:
+                if (!/^\d{6}$/.test(formData.pincode)) {
+                    newErrors.pincode = "Pincode must be a 6-digit number.";
+                }
+                break;
+            case 3:
+                if (!/^\d{10}$/.test(formData.phoneNumber)) {
+                    newErrors.phoneNumber = "Phone number must be 10 digits.";
+                }
+                if (formData.alternatePhoneNumber && !/^\d{10}$/.test(formData.alternatePhoneNumber)) {
+                    newErrors.alternatePhoneNumber = "Alternate phone number must be 10 digits.";
+                }
+                break;
+            case 4:
+                if (formData.message.length > 100) {
+                    newErrors.message = "Message must not exceed 100 characters.";
+                }
+                break;
+            default:
+                break;
+        }
+    
+        setErrors(newErrors); // Update the errors state
+        return Object.keys(newErrors).length === 0; // Return true if no errors
+    }, [step, formData]);
+
+    // Navigate to next step
+    const handleNextStep = useCallback(() => {
+        if (validateStep()) {
+            setErrors({}); // Clear errors before moving to the next step
+            setStep((prev) => prev + 1);
+        }
+    }, [validateStep]);
+    
+    // Navigate to prev step
+    const handlePreviousStep = useCallback(() => {
+        setErrors({}); // Clear errors before moving to the previous step
+        setStep((prev) => prev - 1);
+    }, []);
+
+    // Submit form
+    const handleSubmit = useCallback(async (e) => {
+        e.preventDefault();
+        if (!validateStep()) return;
+
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser) {
+            toast.error("User not found. Please log in again.");
+            return;
+        }
+        try {
+            const userRef = doc(fireDb, "users", storedUser.uid);
+            await updateDoc(userRef, {
+                donations: arrayUnion({ ...formData }),
+            });
+            toast.success("Donation added successfully!");
+            setOpen(false);
+            setStep(1);
+            setFormData({ foodType: [], vegNonVeg: FOOD_PREFERENCES.VEG, quantity: "", state: "", district: "", city: "", street: "", locality: "", pincode: "", phoneNumber: "", alternatePhoneNumber: "", date: "", time: "", message: "", status: "Pending" });
+        } catch (error) {
+            toast.error("Failed to add donation. Please try again.");
+        }
+    }, [formData, validateStep, setOpen]);
+
+    // Memoize district options
+    const districtOptions = useMemo(() => {
+        return formData.state
+            ? statesAndDistricts[formData.state].map((district) => (
+                  <option key={district} value={district}>
+                      {district}
+                  </option>
+              ))
+            : [];
+    }, [formData.state]);
+
+    
+
     return (
         <Dialog open={open} handler={() => {}} className="backdrop-blur-md bg-opacity-50">
             <DialogBody className="p-6 bg-white rounded-lg shadow-lg">
                 <button onClick={() => setOpen(false)} className="absolute top-2 right-2 text-gray-600">&times;</button>
                 <h2 className="text-xl font-semibold text-center mb-4">Add Donation</h2>
                 
-                {/* Food Preference */}
+                {/* Step 1: Food Preference */}
                 {step === 1 && (
-                    <div className="flex flex-col gap-4">
-                        <h3 className="font-bold text-lg mb-0">Veg/Non-Veg</h3>
-                        <div className="flex gap-4">
-                            <label><input type="radio" name="vegNonVeg" value="Veg" checked={formData.vegNonVeg === "Veg"} onChange={handleChange} /> Veg</label>
-                            <label><input type="radio" name="vegNonVeg" value="Non-Veg" checked={formData.vegNonVeg === "Non-Veg"} onChange={handleChange} /> Non-Veg</label>
-                            <label><input type="radio" name="vegNonVeg" value="Both" checked={formData.vegNonVeg === "Both"} onChange={handleChange} /> Both</label>
-                        </div>
-                        <h3 className="font-bold text-lg mb-1">Food Type</h3>
-                        <div className="flex space-x-4">
-                            <label><input type="checkbox" checked={formData.foodType.includes("Packed")} onChange={() => handleMultiSelect("Packed")} /> Packed</label>
-                            <label><input type="checkbox" checked={formData.foodType.includes("Cooked")} onChange={() => handleMultiSelect("Cooked")} /> Cooked</label>
-                        </div>
-                        <h3 className="font-bold text-lg mb-1">Food Quantity (in Kgs)</h3>
-                        <div className="flex gap-4">
-                            <label className="flex items-center gap-2">
-                                <span>Estimate Quantity:</span>
-                                <input 
-                                    type="number" 
-                                    name="packedQuantity" 
-                                    value={formData.quantity || ""} 
-                                    onChange={handleChange} 
-                                    min="1" 
-                                    max="100" 
-                                    className="w-20 border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                />
-                            </label>
-                        </div>
-                        <Button onClick={() => setStep(2)}>Next</Button>
-                    </div>
+                    <FoodPreferenceStep
+                        formData={formData}
+                        handleInputChange={handleInputChange}
+                        handleNextStep={handleNextStep}
+                        errors={errors}
+                        setErrors={setErrors}
+                    />
                 )}
-
-                {/* Address Details */}
+    
+                {/* Step 2: Address Details */}
                 {step === 2 && (
-                    <div className="flex flex-col gap-4">
-                        <h3 className="font-medium">Step 2: Address Details</h3>
-                        <Input name="street" label="Plot No./Street Address" value={formData.street} onChange={handleChange} required />
-                        <Input name="locality" label="Locality" value={formData.locality} onChange={handleChange} required />
-                        {/* State Dropdown */}
-                        <select 
-                            name="state" 
-                            value={formData.state} 
-                            onChange={handleChange} 
-                            className="w-full p-2 border rounded" 
-                            required
-                        >
-                            <option value="">Select State</option>
-                            {Object.keys(statesAndDistricts).map((state) => (
-                                <option key={state} value={state}>
-                                    {state}
-                                </option>
-                            ))}
-                        </select>
-
-                        {/* District Dropdown - Updates based on selected state */}
-                        <select 
-                            name="district" 
-                            value={formData.district} 
-                            onChange={handleChange} 
-                            className="w-full p-2 border rounded" 
-                            disabled={!formData.state} 
-                            required
-                        >
-                            <option value="">Select District</option>
-                            {formData.state &&
-                                statesAndDistricts[formData.state].map((district) => (
-                                    <option key={district} value={district}>
-                                        {district}
-                                    </option>
-                                ))}
-                        </select>
-                        <Input name="city" label="City" value={formData.city} onChange={handleChange} required />
-                        <Input name="pincode" label="Pincode" value={formData.pincode} onChange={handleChange} required />
-                        <Button onClick={() => setStep(1)}>Back</Button>
-                        <Button onClick={() => setStep(3)}>Next</Button>
-                    </div>
+                    <AddressDetailsStep
+                        formData={formData}
+                        handleInputChange={handleInputChange}
+                        handlePreviousStep={handlePreviousStep}
+                        handleNextStep={handleNextStep}
+                        districtOptions={districtOptions}
+                        errors={errors}
+                        setErrors={setErrors}
+                    />
                 )}
-
-                {/* Additional Details */}
+    
+                {/* Step 3: Additional Details */}
                 {step === 3 && (
-                    <form  className="flex flex-col gap-4">
-                        <h3 className="font-medium">Step 3: Date & Time</h3>
-                        <Input type="date" name="date" value={formData.date} onChange={handleChange} required />
-                        <Input type="time" name="time" value={formData.time} onChange={handleChange} required />
-                        <Input type="tel" name="phoneNumber" label="Phone Number" value={formData.phoneNumber} onChange={handleChange} required />
-                        <Input type="tel" name="alternatePhoneNumber" label="Alternate Phone Number" value={formData.alternatePhoneNumber} onChange={handleChange} />
-                        <Button onClick={() => setStep(2)}>Back</Button>
-                        <Button onClick={() => setStep(4)}>Next</Button>
-                    </form>
+                    <AdditionalDetailsStep
+                        formData={formData}
+                        handleInputChange={handleInputChange}
+                        handlePreviousStep={handlePreviousStep}
+                        handleNextStep={handleNextStep}
+                        errors={errors}
+                        setErrors={setErrors}
+                    />
                 )}
-
-                {/* Message */}
+    
+                {/* Step 4: Message */}
                 {step === 4 && (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <label className="font-bold text-lg">Message</label>
-                    <textarea
-                        name="message"
-                        value={formData.message || ""}
-                        onChange={handleChange}
-                        placeholder="Enter your message here..."
-                        rows="4"
-                        className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    ></textarea>
-                    <Button type="button" onClick={() => setStep(3)}>Back</Button>
-                    <Button type="submit">Submit</Button>
-                </form>
-            )}
-
+                    <MessageStep
+                        formData={formData}
+                        handleInputChange={handleInputChange}
+                        handlePreviousStep={handlePreviousStep}
+                        handleSubmit={handleSubmit}
+                        errors={errors}
+                        setErrors={setErrors}
+                    />
+                )}
             </DialogBody>
         </Dialog>
     );
