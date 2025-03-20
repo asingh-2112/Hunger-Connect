@@ -132,7 +132,7 @@ function DonorDashboard() {
                             <thead className={`${mode === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                 <tr>
                                     <th className="px-6 py-3 text-left">S.No</th>
-                                    <th className="px-6 py-3 text-left">Location</th>
+                                    <th className="px-6 py-3 text-left">City</th>
                                     <th className="px-6 py-3 text-left">Date</th>
                                     <th className="px-6 py-3 text-left">Time</th>
                                     <th className="px-6 py-3 text-left">Status</th>
@@ -146,7 +146,7 @@ function DonorDashboard() {
                                             ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
                                         >
                                             <td className="px-6 py-4">{index + 1}.</td>
-                                            <td className="px-6 py-4">{donation.location || "N/A"}</td>
+                                            <td className="px-6 py-4">{donation.city || "N/A"}</td>
                                             <td className="px-6 py-4">{donation.date || "N/A"}</td>
                                             <td className="px-6 py-4">{donation.time || "N/A"}</td>
                                             <td className="px-6 py-4">{donation.status || "Pending"}</td>
