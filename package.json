@@ -14,7 +14,6 @@
     "@ckeditor/ckeditor5-build-decoupled-document": "^44.2.1",
     "@ckeditor/ckeditor5-react": "^9.5.0",
     "@material-tailwind/react": "^2.1.10",
-    "@tinymce/tinymce-react": "^6.0.0",
     "autoprefixer": "^10.4.20",
     "firebase": "^11.4.0",
     "india-state-district": "^1.0.2",
