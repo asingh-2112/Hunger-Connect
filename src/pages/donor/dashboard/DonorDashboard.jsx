@@ -1,19 +1,26 @@
 import React, { useEffect, useState, useContext } from "react";
 import Layout from "../../../components/layout/Layout";
 import { Button } from "@material-tailwind/react";
-import { Link, useNavigate } from "react-router-dom";
+import { doc, onSnapshot, updateDoc, arrayRemove } from "firebase/firestore";
 import { fireDb } from "../../../firebase/FirebaseConfig";
-import { doc, onSnapshot } from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
 import myContext from "../../../context/data/myContext";
-import { FiLogOut, FiPlusCircle } from "react-icons/fi"; 
+import { FiLogOut, FiPlusCircle, FiTrash2 } from "react-icons/fi"; 
 import { FaUserCircle } from "react-icons/fa";
 import PlusButton from "../../../components/plusButton/PlusButton";
+import CreateDonation from "../../../components/createDonation/CreateDonation";
+import { toast } from "react-hot-toast";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
 function DonorDashboard() {
     const navigate = useNavigate();
     const [donations, setDonations] = useState([]);
+    const [userData, setUserData] = useState({ name: "", email: "" ,donorType: ""});
     const context = useContext(myContext);
     const { mode } = context;
+    const [open, setOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedDonation, setSelectedDonation] = useState(null);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -21,19 +28,52 @@ function DonorDashboard() {
 
         const userRef = doc(fireDb, "users", storedUser.uid);
 
-        // ✅ Enable real-time updates using onSnapshot
         const unsubscribe = onSnapshot(userRef, (userSnap) => {
             if (userSnap.exists()) {
-                setDonations(userSnap.data().donations || []);
+                const userData = userSnap.data();
+                setUserData({
+                    name: userData.name || "Anonymous",
+                    email: userData.email || "Not available",
+                    donorType: userData.donorType || "Not available"
+                });
+                setDonations(userData.donations || []);
             }
         });
 
-        return () => unsubscribe(); // ✅ Cleanup Firestore listener when component unmounts
+        return () => unsubscribe();
     }, [navigate]);
 
     const logout = () => {
         localStorage.clear();
         navigate("/");
+    };
+
+    const openDeleteDialog = (donation) => {
+        setSelectedDonation(donation);
+        setConfirmOpen(true);
+    };
+
+    const handleDeleteDonation = async () => {
+        setConfirmOpen(false);
+        if (!selectedDonation) return;
+
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser) {
+            toast.error("User not found. Please log in again.");
+            return;
+        }
+
+        try {
+            const userRef = doc(fireDb, "users", storedUser.uid);
+
+            await updateDoc(userRef, {
+                donations: arrayRemove(selectedDonation),
+            });
+
+            toast.success("Donation deleted successfully!");
+        } catch (error) {
+            toast.error("Failed to delete donation. Please try again.");
+        }
     };
 
     return (
@@ -44,10 +84,19 @@ function DonorDashboard() {
                     ${mode === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
                 >
                     <FaUserCircle className="text-6xl text-gray-400 mb-4" />
-                    <h1 className="font-bold text-2xl">Kamal Nayan Upadhyay</h1>
-                    <h2 className="text-lg text-gray-500">Food Provider(Donor)</h2>
-                    <p className="text-sm text-gray-500">knupadhyay784@gmail.com</p>
-                    <p className="text-sm text-gray-500"><strong>Total Blogs:</strong> 15</p>
+                    
+                    {/* ✅ Fetch Name from Firestore */}
+                    <h1 className="font-bold text-2xl">{userData.name}</h1>
+
+                    <h2 className="text-lg text-gray-500">{userData.donorType} (Food Provider)</h2>
+                    
+                    {/* ✅ Fetch Email from Firestore */}
+                    <p className="text-sm text-gray-500">{userData.email}</p>
+
+                    {/* ✅ Display Total Donations Count */}
+                    <p className="text-sm text-gray-500">
+                        <strong>Total Donations:</strong> {donations.length}
+                    </p>
                     
                     {/* Action Buttons */}
                     <div className="mt-4 flex gap-4">
@@ -87,37 +136,57 @@ function DonorDashboard() {
                                     <th className="px-6 py-3 text-left">Date</th>
                                     <th className="px-6 py-3 text-left">Time</th>
                                     <th className="px-6 py-3 text-left">Status</th>
+                                    <th className="px-6 py-3 text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {donations.length > 0 ? (
                                     donations.map((donation, index) => (
-                                        <tr
-                                            key={index}
-                                            className={`border-b transition-all
-                                                ${mode === 'dark' 
-                                                    ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' 
-                                                    : 'border-gray-300 bg-white hover:bg-gray-100'}`}
+                                        <tr key={index} className={`border-b transition-all
+                                            ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
                                         >
                                             <td className="px-6 py-4">{index + 1}.</td>
                                             <td className="px-6 py-4">{donation.location || "N/A"}</td>
                                             <td className="px-6 py-4">{donation.date || "N/A"}</td>
                                             <td className="px-6 py-4">{donation.time || "N/A"}</td>
                                             <td className="px-6 py-4">{donation.status || "Pending"}</td>
+                                            <td className="px-6 py-4">
+                                                <button 
+                                                    onClick={() => openDeleteDialog(donation)}
+                                                    className="text-red-600 hover:text-red-800 transition-all"
+                                                >
+                                                    <FiTrash2 size={18} />
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
-                                    <tr className={mode === 'dark' ? 'bg-gray-900' : 'bg-white'}>
-                                        <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                                            No Donations Found
-                                        </td>
+                                    <tr>
+                                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">No Donations Found</td>
                                     </tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <PlusButton/>
+
+                {/* ✅ Plus Button to Open Modal */}
+                <PlusButton onClick={() => setOpen(true)} />
+
+                {/* ✅ Create Donation Modal */}
+                <CreateDonation open={open} setOpen={setOpen} />
+
+                {/* ✅ Confirmation Dialog */}
+                <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        Are you sure you want to delete this donation?
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setConfirmOpen(false)}>No</Button>
+                        <Button onClick={handleDeleteDonation} className="bg-red-600 text-white">Yes</Button>
+                    </DialogActions>
+                </Dialog>
             </div>
         </Layout>
     );
