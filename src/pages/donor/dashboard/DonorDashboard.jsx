@@ -7,7 +7,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import myContext from "../../../context/data/myContext";
 import { FiLogOut, FiPlusCircle } from "react-icons/fi"; 
 import { FaUserCircle } from "react-icons/fa";
-import PlusButton from "../../../components/plusButton/plusButton";
+import PlusButton from "../../../components/plusButton/PlusButton";
 
 function DonorDashboard() {
     const navigate = useNavigate();
