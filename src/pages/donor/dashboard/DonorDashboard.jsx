@@ -6,7 +6,7 @@ import { fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, onSnapshot } from "firebase/firestore";
 import myContext from "../../../context/data/myContext";
 import { FiLogOut, FiPlusCircle } from "react-icons/fi"; 
-import { FaPlus, FaUserCircle } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 import PlusButton from "../../../components/plusButton/plusButton";
 
 function DonorDashboard() {
@@ -117,7 +117,6 @@ function DonorDashboard() {
                         </table>
                     </div>
                 </div>
-
                 <PlusButton/>
             </div>
         </Layout>
