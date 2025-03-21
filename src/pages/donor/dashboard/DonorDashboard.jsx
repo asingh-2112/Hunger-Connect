@@ -88,13 +88,13 @@ function DonorDashboard() {
                     {/* ✅ Fetch Name from Firestore */}
                     <h1 className="font-bold text-2xl">{userData.name}</h1>
 
-                    <h2 className="text-lg text-gray-500">{userData.donorType} (Food Provider)</h2>
+                    <h2 className="text-lg">{userData.donorType} (Food Provider)</h2>
                     
                     {/* ✅ Fetch Email from Firestore */}
-                    <p className="text-sm text-gray-500">{userData.email}</p>
+                    <p className="text-sm">{userData.email}</p>
 
                     {/* ✅ Display Total Donations Count */}
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm">
                         <strong>Total Donations:</strong> {donations.length}
                     </p>
                     
@@ -163,6 +163,7 @@ function DonorDashboard() {
                                                 <button 
                                                     onClick={() => openDeleteDialog(donation)}
                                                     className="text-red-600 hover:text-red-800 transition-all"
+                                                    title="Delete Donation"
                                                 >
                                                     <FiTrash2 size={18} />
                                                 </button>
