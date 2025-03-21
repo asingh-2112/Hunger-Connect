@@ -56,6 +56,7 @@ const AddressDetailsStep = ({
             onChange={handleInputChange}
             required
         />
+        {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
         <Input
             name="locality"
             label="Locality"
@@ -63,6 +64,7 @@ const AddressDetailsStep = ({
             onChange={handleInputChange}
             required
         />
+        {errors.locality && <p className="text-red-500 text-sm">{errors.locality}</p>}
         <Input
             type="number"
             name="pincode"
@@ -86,6 +88,7 @@ const AddressDetailsStep = ({
                 </option>
             ))}
         </select>
+        {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
         <select
             name="district"
             value={formData.district}
@@ -97,6 +100,7 @@ const AddressDetailsStep = ({
             <option value="">Select District</option>
             {districtOptions}
         </select>
+        {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
         <Input
             name="city"
             label="City"
@@ -104,6 +108,7 @@ const AddressDetailsStep = ({
             onChange={handleInputChange}
             required
         />
+        {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
         <div className="flex gap-4">
             <Button onClick={handlePreviousStep}>Back</Button>
             <Button onClick={handleNextStep}>Next</Button>

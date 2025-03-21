@@ -150,26 +150,67 @@ const CreateDonation = ({ open, setOpen }) => {
     
         switch (step) {
             case 1:
-                // No validation for step 1
+                // Step 1: Food Preference
+                if (!formData.vegNonVeg) {
+                    newErrors.vegNonVeg = "Please select a food preference.";
+                }
+                if (formData.foodType.length === 0) {
+                    newErrors.foodType = "Please select at least one food type.";
+                }
+                if (!formData.quantity) {
+                    newErrors.quantity = "Please enter the food quantity.";
+                }
                 break;
+    
             case 2:
-                if (!/^\d{6}$/.test(formData.pincode)) {
+                // Step 2: Address Details
+                if (!formData.street) {
+                    newErrors.street = "Street address is required.";
+                }
+                if (!formData.locality) {
+                    newErrors.locality = "Locality is required.";
+                }
+                if (!formData.state) {
+                    newErrors.state = "State is required.";
+                }
+                if (!formData.district) {
+                    newErrors.district = "District is required.";
+                }
+                if (!formData.city) {
+                    newErrors.city = "City is required.";
+                }
+                if (!formData.pincode) {
+                    newErrors.pincode = "Pincode is required.";
+                } else if (!/^\d{6}$/.test(formData.pincode)) {
                     newErrors.pincode = "Pincode must be a 6-digit number.";
                 }
                 break;
+    
             case 3:
-                if (!/^\d{10}$/.test(formData.phoneNumber)) {
+                // Step 3: Additional Details
+                if (!formData.phoneNumber) {
+                    newErrors.phoneNumber = "Phone number is required.";
+                } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
                     newErrors.phoneNumber = "Phone number must be 10 digits.";
                 }
                 if (formData.alternatePhoneNumber && !/^\d{10}$/.test(formData.alternatePhoneNumber)) {
                     newErrors.alternatePhoneNumber = "Alternate phone number must be 10 digits.";
                 }
+                if (!formData.date) {
+                    newErrors.date = "Date is required.";
+                }
+                if (!formData.time) {
+                    newErrors.time = "Time is required.";
+                }
                 break;
+    
             case 4:
+                // Step 4: Message
                 if (formData.message.length > 100) {
                     newErrors.message = "Message must not exceed 100 characters.";
                 }
                 break;
+    
             default:
                 break;
         }

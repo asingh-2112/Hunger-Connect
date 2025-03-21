@@ -10,8 +10,10 @@ const AdditionalDetailsStep = ({
 }) => (
     <div className="flex flex-col gap-4">
         <h3 className="font-medium">Step 3: Additional Details</h3>
-        <Input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
-        <Input type="time" name="time" value={formData.time} onChange={handleInputChange} required />
+        <Input type="date" name="date" label="Pickup Date (When will the food be donated?)" value={formData.date} onChange={handleInputChange} required />
+        {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
+        <Input type="time" name="time" label="Pickup Time (At what time will the food be collected?)" value={formData.time} onChange={handleInputChange} required />
+        {errors.time && <p className="text-red-500 text-sm">{errors.time}</p>}
         <Input
             type="tel"
             name="phoneNumber"
