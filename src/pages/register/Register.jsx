@@ -4,6 +4,8 @@ import { auth, fireDb } from "../../firebase/FirebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FaBox, FaTruckLoading } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast"; // Import toast from react-hot-toast
+import { Input } from "@material-tailwind/react";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -87,29 +89,48 @@ const Register = () => {
     setStep(step - 1);
   };
 
-  const handleRegister = async (e) => {
+
+const handleRegister = async (e) => {
     e.preventDefault();
+
+    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
+        toast.error("Passwords do not match"); // Show error toast
+        return;
     }
 
+    // Check if email is already registered
     const emailRef = doc(fireDb, "users", formData.email);
     const emailSnap = await getDoc(emailRef);
     if (emailSnap.exists()) {
-      setError("Email is already registered");
-      return;
+        toast.error("Email is already registered"); // Show error toast
+        return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      await setDoc(doc(fireDb, "users", userCredential.user.uid), { ...formData, role });
-      alert("Registration Successful!");
-      navigate("/adminlogin"); // Redirect to login page after successful registration
+        // Create user with email and password
+        const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            formData.email,
+            formData.password
+        );
+
+        // Save user data to Firestore
+        await setDoc(doc(fireDb, "users", userCredential.user.uid), {
+            ...formData,
+            role,
+        });
+
+        // Show success toast
+        toast.success("Registration Successful!");
+
+        // Redirect to login page after successful registration
+        navigate("/adminlogin");
     } catch (error) {
-      setError(error.message);
+        // Show error toast with the error message
+        toast.error(error.message);
     }
-  };
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -181,19 +202,20 @@ const Register = () => {
                 {/* Show input field if "Other" is selected */}
                 {formData.donorType === "Other" && (
                 <div className="mb-3">
-                    <input
+                    <Input
                     type="text"
                     name="customDonorType"
-                    placeholder="Enter Donor Type"
+                    label="Enter Donor Type"
                     value={formData.customDonorType} // Controlled input field
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
+                    required
                     />
                 </div>
                 )}
 
                 <div className="mb-3">
-                  <input type="text" name="name" placeholder="Name" onChange={handleChange} className="w-full p-2 border rounded" />
+                  <Input type="text" name="name" label="Name" onChange={handleChange} className="w-full p-2 border rounded" required/>
                 </div>
               </>
             )}
@@ -222,24 +244,26 @@ const Register = () => {
                 {/* Show input field if "Other" is selected */}
                 {formData.organizationType === "Other" && (
                 <div className="mb-3">
-                    <input
+                    <Input
                     type="text"
                     name="customOrganizationType"
-                    placeholder="Enter Organization Type"
+                    label="Enter Organization Type"
                     value={formData.customOrganizationType} // Controlled input field
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
+                    required
                     />
                 </div>
                 )}
 
                 <div className="mb-3">
-                <input
+                <Input
                     type="text"
                     name="organizationName"
-                    placeholder="Organization Name"
+                    label="Organization Name"
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
+                    required
                 />
                 </div>
             </>
@@ -279,9 +303,9 @@ const Register = () => {
                     ))}
                 </select>
 
-                <input type="text" name="city" placeholder="City" onChange={handleChange} className="w-full p-2 border rounded" />
-                <input type="text" name="pinCode" placeholder="Pin Code" onChange={handleChange} className="w-full p-2 border rounded" />
-                <input type="text" name="phone" placeholder="Phone Number" onChange={handleChange} className="w-full p-2 border rounded" />
+                <Input type="text" name="city" label="City" onChange={handleChange} className="w-full p-2 border rounded" required/>
+                <Input type="text" name="pinCode" label="Pin Code" onChange={handleChange} className="w-full p-2 border rounded" required/>
+                <Input type="text" name="phone" label="Phone Number" onChange={handleChange} className="w-full p-2 border rounded" required/>
 
                 <button type="button" onClick={nextStep} className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">
                 Next
@@ -292,9 +316,9 @@ const Register = () => {
         {/* Step 4: Contact & Password */}
         {step === 4 && (
           <form onSubmit={handleRegister} className="space-y-4">
-            <input type="email" name="email" placeholder="Email" onChange={handleChange} className="w-full p-2 border rounded" />
-            <input type="password" name="password" placeholder="Password" onChange={handleChange} className="w-full p-2 border rounded" />
-            <input type="password" name="confirmPassword" placeholder="Re-enter Password" onChange={handleChange} className="w-full p-2 border rounded" />
+            <Input type="email" name="email" label="Email" onChange={handleChange} className="w-full p-2 border rounded" required/>
+            <Input type="password" name="password" label="Password" onChange={handleChange} className="w-full p-2 border rounded" required/>
+            <Input type="password" name="confirmPassword" label="Re-enter Password" onChange={handleChange} className="w-full p-2 border rounded" required />
             {error && <p className="text-red-500">{error}</p>}
 
             <button type="submit" className="w-full bg-green-500 text-white p-2 rounded-lg hover:bg-green-600">
