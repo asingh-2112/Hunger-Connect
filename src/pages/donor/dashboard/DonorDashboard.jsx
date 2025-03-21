@@ -131,12 +131,12 @@ function DonorDashboard() {
                         <table className="w-full text-sm border-collapse">
                             <thead className={`${mode === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                 <tr>
-                                    <th className="px-6 py-3 text-left">S.No</th>
-                                    <th className="px-6 py-3 text-left">City</th>
-                                    <th className="px-6 py-3 text-left">Date</th>
-                                    <th className="px-6 py-3 text-left">Time</th>
-                                    <th className="px-6 py-3 text-left">Status</th>
-                                    <th className="px-6 py-3 text-left">Actions</th>
+                                    <th className="px-6 py-3 text-center">S.No</th>
+                                    <th className="px-6 py-3 text-center">City</th>
+                                    <th className="px-6 py-3 text-center">Date</th>
+                                    <th className="px-6 py-3 text-center">Time</th>
+                                    <th className="px-6 py-3 text-center">Status</th>
+                                    <th className="px-6 py-3 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -145,12 +145,21 @@ function DonorDashboard() {
                                         <tr key={index} className={`border-b transition-all
                                             ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
                                         >
-                                            <td className="px-6 py-4">{index + 1}.</td>
-                                            <td className="px-6 py-4">{donation.city || "N/A"}</td>
-                                            <td className="px-6 py-4">{donation.date || "N/A"}</td>
-                                            <td className="px-6 py-4">{donation.time || "N/A"}</td>
-                                            <td className="px-6 py-4">{donation.status || "Pending"}</td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 text-center">{index + 1}.</td>
+                                            <td className="px-6 py-4 text-center">{donation.city || "N/A"}</td>
+                                            <td className="px-6 py-4 text-center">{donation.date || "N/A"}</td>
+                                            <td className="px-6 py-4 text-center">{donation.time || "N/A"}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold
+                                                    ${donation.status === 'Pending' ? 'bg-yellow-200 text-black-800' :
+                                                    donation.status === 'Requested by someone' ? 'bg-blue-200 text-blue-800' :
+                                                    donation.status === 'Accepted by you' ? 'bg-green-200 text-green-800' :
+                                                    'bg-gray-200 text-gray-800'}`}
+                                                >
+                                                    {donation.status || "Pending"}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
                                                 <button 
                                                     onClick={() => openDeleteDialog(donation)}
                                                     className="text-red-600 hover:text-red-800 transition-all"
