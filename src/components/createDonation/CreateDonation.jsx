@@ -20,10 +20,6 @@ const FOOD_PREFERENCES = {
     BOTH: "Both",
 };
 
-// Helper functions
-const validatePincode = (pincode) => /^\d{6}$/.test(pincode);
-const validatePhoneNumber = (phone) => /^\d{10}$/.test(phone);
-const validateMessage = (message) => message.length <= 100;
 
 const CreateDonation = ({ open, setOpen }) => {
 
