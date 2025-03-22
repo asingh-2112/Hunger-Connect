@@ -21,6 +21,7 @@ import { auth, fireDb } from './firebase/FirebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import Register from './pages/register/Register';
 import CreateDonation from './components/createDonation/CreateDonation';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 // import { auth, db, getDoc, doc } from './firebase'; 
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
           <Toaster />
         </Router>
       </MyState>
+      <SpeedInsights />
     </div>
   );
 }
