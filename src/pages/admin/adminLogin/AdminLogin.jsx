@@ -7,6 +7,7 @@ import { auth, fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { Button, Input } from "@material-tailwind/react";
 import { Eye, EyeOff } from "lucide-react";
+import LayoutRegLog from "../../../components/layoutRegLog/LayoutRegLog";
 
 export default function AdminLogin() {
     const context = useContext(myContext);
@@ -67,6 +68,7 @@ export default function AdminLogin() {
     }, []);
 
     return (
+        <LayoutRegLog>
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                 {/* Heading */}
@@ -139,5 +141,6 @@ export default function AdminLogin() {
                 </form>
             </div>
         </div>
+        </LayoutRegLog>
     );
 }

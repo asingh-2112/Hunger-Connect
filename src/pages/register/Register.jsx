@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@material-tailwind/react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+import LayoutRegLog from "../../components/layoutRegLog/LayoutRegLog";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -268,6 +269,7 @@ const Register = () => {
   };
 
   return (
+    <LayoutRegLog>
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         {/* Progress Indicator */}
@@ -605,6 +607,7 @@ const Register = () => {
         </p>
       </div>
     </div>
+    </LayoutRegLog>
   );
 };
 
