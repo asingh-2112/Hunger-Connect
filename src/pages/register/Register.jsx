@@ -97,7 +97,7 @@ const Register = () => {
       case 4:
         // Step 4: Contact & Password
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&-])[A-Za-z\d@$!%*?&]{8,}$/;
 
         if (!formData.email) {
           newErrors.email = "Please enter your email.";
@@ -108,7 +108,7 @@ const Register = () => {
         if (!formData.password) {
           newErrors.password = "Please enter a password.";
         } else if (!passwordPattern.test(formData.password)) {
-          newErrors.password = "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.";
+          newErrors.password = "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character(@$!%*?&-).";
         }
 
         if (!formData.confirmPassword) {
