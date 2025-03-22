@@ -6,6 +6,7 @@ import { FaBox, FaTruckLoading } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@material-tailwind/react";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -30,15 +31,13 @@ const Register = () => {
 
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateStep = () => {
     const newErrors = {};
 
     switch (step) {
-      case 1:
-        // Step 1: No validation needed (role selection)
-        break;
-
       case 2:
         // Step 2: Basic Information
         if (role === "provider") {
@@ -233,12 +232,25 @@ const Register = () => {
         formData.email,
         formData.password
       );
-
+      
       // Save user data to Firestore
-      await setDoc(doc(fireDb, "users", userCredential.user.uid), {
-        ...formData,
+      const userData = {
+        name: formData.name,
+        email: formData.email,
         role,
-      });
+        active: true, // Set the account as active by default
+        donorType: formData.donorType || null,
+        organizationName: formData.organizationName || null,
+        organizationType: formData.organizationType || null,
+        state: formData.state,
+        district: formData.district,
+        city: formData.city,
+        locality: formData.locality,
+        street: formData.street,
+        pinCode: formData.pinCode,
+        phone: formData.phone,
+      };
+      await setDoc(doc(fireDb, "users", userCredential.user.uid), userData);
       toast.success("Registration successful!");
 
       // Redirect to login page after successful registration
@@ -524,33 +536,50 @@ const Register = () => {
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
-            <Input
-              type="password"
-              name="password"
-              label={
-                <>
-                  Password <span className="text-red-500">*</span> {/* Red star */}
-                </>
-              }
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            // required
-            />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+            {/* Password Field */}
+            <div className="relative">
+              {/* <label className="block text-sm font-medium mb-1">Password</label> */}
+              <div className="relative">
+                <Input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  label={
+                    <>
+                      Password <span className="text-red-500">*</span> {/* Red star */}
+                    </>
+                  }
+                  onChange={handleChange} 
+                  className="w-full p-2 border rounded pr-10" 
+                  style={{ WebkitTextSecurity: "none" }}
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-500">
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+            </div>
 
-            <Input
-              type="password"
-              name="confirmPassword"
-              label={
-                <>
-                  Re-enter Password <span className="text-red-500">*</span> {/* Red star */}
-                </>
-              }
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            // required
-            />
-            {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+            {/* Confirm Password Field */}
+            <div className="relative">
+              {/* <label className="block text-sm font-medium mb-1">Confirm Password</label> */}
+              <div className="relative">
+                <Input 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  name="confirmPassword" 
+                  onChange={handleChange} 
+                  className="w-full p-2 border rounded pr-10" 
+                  label={
+                    <>
+                      Re-enter Password <span className="text-red-500">*</span> {/* Red star */}
+                    </>
+                  }
+                  />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-gray-500">
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+            </div>
 
             {/* {error && <p className="text-red-500">{error}</p>} */}
 

@@ -5,10 +5,13 @@ import toast from "react-hot-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import { Button, Input } from "@material-tailwind/react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
     const context = useContext(myContext);
     const { mode } = context;
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -26,6 +29,10 @@ export default function AdminLogin() {
 
             if (userSnap.exists()) {
                 const userData = userSnap.data();
+                if (!userData.active) {
+                    toast.error("Your account has been deactivated. Contact support.");
+                    return;
+                }
                 toast.success("Login successful");
 
                 // Store user data in localStorage
@@ -77,31 +84,46 @@ export default function AdminLogin() {
                 {/* Form */}
                 <form className="space-y-4">
                     {/* Email Input */}
-                    <input
+                    
+                    <Input
                         type="email"
-                        placeholder="Email"
+                        name="email"
+                        label="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full p-2 border rounded"
+                        required
                     />
+                    
 
                     {/* Password Input */}
-                    <input
-                        type="password"
-                        placeholder="Password"
+                    {/* <div className="relative"> */}
+                    <div className="relative">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        label={
+                          <>
+                            Password <span className="text-red-500">*</span> {/* Red star */}
+                          </>
+                        }
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full p-2 border rounded"
                     />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-500">
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                    </div>
+                    {/* </div> */}
 
                     {/* Login Button */}
-                    <button
+                    <Button
                         type="button"
                         onClick={login}
                         className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
                     >
                         Login
-                    </button>
+                    </Button>
 
                     {/* Register Option */}
                     <p className="text-center text-gray-600">
