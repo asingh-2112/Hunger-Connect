@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Dialog, DialogBody} from "@material-tailwind/react";
-import { addDoc, collection, doc, getDoc,updateDoc, arrayUnion} from "firebase/firestore";
+import { addDoc, collection, doc, getDoc,updateDoc, arrayUnion, serverTimestamp} from "firebase/firestore";
 import { fireDb } from "../../firebase/FirebaseConfig";
 import toast from "react-hot-toast";
 import FoodPreferenceStep from "./steps/FoodPreferenceStep";
@@ -84,6 +84,7 @@ const CreateDonation = ({ open, setOpen }) => {
         status: "Pending",
         donorId: "",
         donorName: "",
+        createdAt:serverTimestamp(),
     });
 
     // Fetch user data on open
@@ -291,6 +292,7 @@ const CreateDonation = ({ open, setOpen }) => {
                 status: "Pending",
                 donorId: "",
                 donorName:"",
+                createdAt: serverTimestamp(),
             });
         } catch (error) {
             toast.error("Failed to add donation. Please try again.");

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Layout from "../../../components/layout/Layout";
 import { Button } from "@material-tailwind/react";
-import { doc, onSnapshot, updateDoc, arrayRemove } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, arrayRemove, collection } from "firebase/firestore";
 import { fireDb } from "../../../firebase/FirebaseConfig";
 import { Link, useNavigate } from "react-router-dom";
 import myContext from "../../../context/data/myContext";
@@ -28,21 +28,34 @@ function NgoDashboard() {
         if (!storedUser) return navigate("/");
 
         const userRef = doc(fireDb, "users", storedUser.uid);
+        const donationsCollectionRef = collection(fireDb, "donations");
 
-        const unsubscribe = onSnapshot(userRef, (userSnap) => {
+        // Listen for changes in NGO's user data
+        const unsubscribeUser = onSnapshot(userRef, (userSnap) => {
             if (userSnap.exists()) {
                 const userData = userSnap.data();
                 setUserData({
                     name: userData.organizationName || "Anonymous",
                     email: userData.email || "Not available",
-                    organizationType: userData.organizationType || "Not available"
+                    organizationType: userData.organizationType || "Not available",
                 });
                 setDonations(userData.donations || []);
             }
-            console.log(userData)
         });
 
-        return () => unsubscribe();
+        // Listen for changes in the donations collection (to detect deletions)
+        const unsubscribeDonations = onSnapshot(donationsCollectionRef, (snapshot) => {
+            setDonations((prevDonations) =>
+                prevDonations.filter((donation) =>
+                    snapshot.docs.some((doc) => doc.id === donation.id) // Keep only existing donations
+                )
+            );
+        });
+
+        return () => {
+            unsubscribeUser();
+            unsubscribeDonations();
+        };
     }, [navigate]);
 
     const logout = () => {
