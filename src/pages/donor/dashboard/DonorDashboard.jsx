@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Layout from "../../../components/layout/Layout";
 import { Button } from "@material-tailwind/react";
-import { collection, query, where, getDocs, deleteDoc, doc, onSnapshot, updateDoc, arrayRemove } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, deleteDoc, doc, onSnapshot, updateDoc, arrayRemove } from "firebase/firestore";
 import { fireDb } from "../../../firebase/FirebaseConfig";
 import { Link, useNavigate } from "react-router-dom";
 import myContext from "../../../context/data/myContext";
@@ -49,37 +49,42 @@ function DonorDashboard() {
         return () => unsubscribeUser();
     }, [navigate]);
 
-    useEffect(() => {
-        const fetchDonations = async () => {
-            const storedUser = JSON.parse(localStorage.getItem("user"));
-            if (!storedUser) return;
+const fetchDonations = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) return;
 
-            try {
-                // Fetch all donations based on donationIds from user's Firestore document
-                const donationsQuery = query(collection(fireDb, "donations"), where("donorId", "==", storedUser.uid));
-                const donationsSnap = await getDocs(donationsQuery);
-                const fetchedDonations = donationsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    try {
+        // Fetch donations ordered by createdAt (descending)
+        const donationsQuery = query(
+            collection(fireDb, "donations"),
+            where("donorId", "==", storedUser.uid),
+            orderBy("createdAt", "desc") // ✅ Sorts by newest first
+        );
 
-                // Retrieve latest donation from localStorage
-                const latestDonation = JSON.parse(localStorage.getItem("latestDonation"));
+        // const donationsQuery = query(
+        //     collection(fireDb, "donations"),
+        //     orderBy("createdAt", "desc"),  // ✅ Order first
+        //     where("donorId", "==", storedUser.uid) // ✅ Then filter
+        // );
 
-                // If the latest donation exists and isn't already in the list, add it
-                if (latestDonation && !fetchedDonations.some(donation => donation.id === latestDonation.id)) {
-                    setDonations(prevDonations => [latestDonation, ...prevDonations]); // Newest donation at top
-                } else {
-                    setDonations(fetchedDonations);
-                }
+        const donationsSnap = await getDocs(donationsQuery);
+        let fetchedDonations = donationsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                setDonations(fetchedDonations);
-            } catch (error) {
-                console.error("Error fetching donations:", error);
-            }
-        };
+        // Retrieve latest donation from localStorage
+        const latestDonation = JSON.parse(localStorage.getItem("latestDonation"));
 
-        if (userData.donationIds.length > 0) {
-            fetchDonations();
+        // Ensure latest donation is at the top if not already in the list
+        if (latestDonation && !fetchedDonations.some(donation => donation.id === latestDonation.id)) {
+            fetchedDonations = [latestDonation, ...fetchedDonations];
         }
-    }, [userData.donationIds]);
+
+        setDonations(fetchedDonations);
+    } catch (error) {
+        console.error("Error fetching donations:", error);
+    }
+};
+
+    
 
     const logout = () => {
         localStorage.clear();
@@ -191,7 +196,15 @@ function DonorDashboard() {
                                             <td className="px-6 py-4 text-center">{donation.city || "N/A"}</td>
                                             <td className="px-6 py-4 text-center">{donation.date || "N/A"}</td>
                                             <td className="px-6 py-4 text-center">{donation.time || "N/A"}</td>
-                                            <td className="px-6 py-4 text-center">{donation.status || "Pending"}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold
+                                                    ${donation.status === 'Pending' ? 'bg-yellow-200 text-black-800' :
+                                                    donation.status === 'Accepted' ? 'bg-green-200 text-black-800' :
+                                                    'bg-gray-200 text-gray-800'}`}
+                                                >
+                                                    {donation.status || "Pending"}
+                                                </span>
+                                            </td>
                                             <td className="px-6 py-4 text-center">
                                                 <button onClick={() => openDeleteDialog(donation)} className="text-red-600 hover:text-red-800 transition-all" title="Delete Donation">
                                                     <FiTrash2 size={18} />
