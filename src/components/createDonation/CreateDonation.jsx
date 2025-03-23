@@ -1,6 +1,6 @@
-import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
-import { Dialog, DialogBody, Input, Button } from "@material-tailwind/react";
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Dialog, DialogBody} from "@material-tailwind/react";
+import { addDoc, collection, doc, getDoc,updateDoc, arrayUnion} from "firebase/firestore";
 import { fireDb } from "../../firebase/FirebaseConfig";
 import toast from "react-hot-toast";
 import FoodPreferenceStep from "./steps/FoodPreferenceStep";
@@ -82,6 +82,7 @@ const CreateDonation = ({ open, setOpen }) => {
         time: "",
         message: "",
         status: "Pending",
+        donorId: "",
     });
 
     // Fetch user data on open
@@ -108,6 +109,7 @@ const CreateDonation = ({ open, setOpen }) => {
                             pincode: userData.pinCode || "",
                             phoneNumber: userData.phone || "",
                             alternatePhoneNumber: userData.alternatePhoneNumber || "",
+                            donorId: userData.uid,
                         }));
                     }
                 } catch (error) {
@@ -230,29 +232,68 @@ const CreateDonation = ({ open, setOpen }) => {
     }, []);
 
     // Submit form
+
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         if (!validateStep()) return;
-
+    
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser) {
             toast.error("User not found. Please log in again.");
             return;
         }
+    
         try {
+            // Step 1: Add new donation to "donations" collection
+            const donationRef = await addDoc(collection(fireDb, "donations"), {
+                ...formData,
+                donorId: storedUser.uid, // Ensure donorId is saved
+            });
+    
+            // Step 2: Store donation ID inside user's document
             const userRef = doc(fireDb, "users", storedUser.uid);
             await updateDoc(userRef, {
-                donations: arrayUnion({ ...formData }),
+                donationIds: arrayUnion(donationRef.id), // Append new donation ID to user
             });
+    
+            // Step 3: Store ONLY the latest donation in localStorage (overwrite previous)
+            const latestDonation = {
+                id: donationRef.id,
+                date: formData.date,
+                time: formData.time,
+                city: formData.city,
+                status: "Pending",
+            };
+    
+            localStorage.setItem("latestDonation", JSON.stringify(latestDonation));
+    
             toast.success("Donation added successfully!");
             setOpen(false);
             setStep(1);
-            setFormData({ foodType: [], vegNonVeg: FOOD_PREFERENCES.VEG, quantity: "", state: "", district: "", city: "", street: "", locality: "", pincode: "", phoneNumber: "", alternatePhoneNumber: "", date: "", time: "", message: "", status: "Pending" });
+            setFormData({
+                foodType: [],
+                vegNonVeg: FOOD_PREFERENCES.VEG,
+                quantity: "",
+                state: "",
+                district: "",
+                city: "",
+                street: "",
+                locality: "",
+                pincode: "",
+                phoneNumber: "",
+                alternatePhoneNumber: "",
+                date: "",
+                time: "",
+                message: "",
+                status: "Pending",
+                donorId: "",
+            });
         } catch (error) {
             toast.error("Failed to add donation. Please try again.");
+            console.error("Error saving donation:", error);
         }
     }, [formData, validateStep, setOpen]);
-
+    
     // Memoize district options
     const districtOptions = useMemo(() => {
         return formData.state
