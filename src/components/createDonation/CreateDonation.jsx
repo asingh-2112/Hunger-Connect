@@ -83,6 +83,7 @@ const CreateDonation = ({ open, setOpen }) => {
         message: "",
         status: "Pending",
         donorId: "",
+        donorName: "",
     });
 
     // Fetch user data on open
@@ -242,12 +243,14 @@ const CreateDonation = ({ open, setOpen }) => {
             toast.error("User not found. Please log in again.");
             return;
         }
+        console.log(storedUser);
     
         try {
             // Step 1: Add new donation to "donations" collection
             const donationRef = await addDoc(collection(fireDb, "donations"), {
                 ...formData,
                 donorId: storedUser.uid, // Ensure donorId is saved
+                donorName: storedUser.name, // Ensure donorId is saved
             });
     
             // Step 2: Store donation ID inside user's document
@@ -287,6 +290,7 @@ const CreateDonation = ({ open, setOpen }) => {
                 message: "",
                 status: "Pending",
                 donorId: "",
+                donorName:"",
             });
         } catch (error) {
             toast.error("Failed to add donation. Please try again.");
