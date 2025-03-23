@@ -16,12 +16,12 @@ import SearchButton from "../../../components/searchButton/SearchButton";
 function NgoDashboard() {
     const navigate = useNavigate();
     const [donations, setDonations] = useState([]);
-    const [userData, setUserData] = useState({ name: "", email: "" ,donorType: ""});
+    const [userData, setUserData] = useState({ organizatioName: "", email: "" ,organizationType: ""});
     const context = useContext(myContext);
     const { mode } = context;
     const [open, setOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [selectedDonation, setSelectedDonation] = useState(null);
+    const [selectedDonationId, setSelectedDonationId] = useState(null);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -33,12 +33,13 @@ function NgoDashboard() {
             if (userSnap.exists()) {
                 const userData = userSnap.data();
                 setUserData({
-                    name: userData.name || "Anonymous",
+                    name: userData.organizationName || "Anonymous",
                     email: userData.email || "Not available",
-                    donorType: userData.donorType || "Not available"
+                    organizationType: userData.organizationType || "Not available"
                 });
                 setDonations(userData.donations || []);
             }
+            console.log(userData)
         });
 
         return () => unsubscribe();
@@ -49,14 +50,16 @@ function NgoDashboard() {
         navigate("/");
     };
 
-    const openDeleteDialog = (donation) => {
-        setSelectedDonation(donation);
+    // Open confirmation dialog and store selected donation ID
+    const openWithdrawDialog = (donationId) => {
+        setSelectedDonationId(donationId);
         setConfirmOpen(true);
     };
 
-    const handleDeleteDonation = async () => {
+    // Withdraw function
+    const handleWithdrawDonation = async () => {
         setConfirmOpen(false);
-        if (!selectedDonation) return;
+        if (!selectedDonationId) return;
 
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser) {
@@ -65,17 +68,32 @@ function NgoDashboard() {
         }
 
         try {
-            const userRef = doc(fireDb, "users", storedUser.uid);
-
-            await updateDoc(userRef, {
-                donations: arrayRemove(selectedDonation),
+            
+            const donationId= selectedDonationId;
+            console.log(selectedDonationId);
+            const donationRef = doc(fireDb, "donations", donationId);
+            await updateDoc(donationRef, {
+                status: "Pending",
+                ngoDetails: {}  // ✅ Remove NGO details
             });
+            
+            const userRef = doc(fireDb, "users", storedUser.uid);
+            await updateDoc(userRef, {
+                donations: arrayRemove(
+                    donations.find((d) => d.id === selectedDonationId)
+                ),
+            });
+            // Remove withdrawn donation from UI
+            setDonations((prevDonations) =>
+                prevDonations.filter((donation) => donation.id !== selectedDonationId)
+            );
 
-            toast.success("Donation deleted successfully!");
+            toast.success("Donation withdrawn successfully!");
         } catch (error) {
-            toast.error("Failed to delete donation. Please try again.");
+            toast.error("Failed to withdraw donation. Please try again.");
         }
     };
+    
 
     return (
         <Layout>
@@ -89,14 +107,14 @@ function NgoDashboard() {
                     {/* ✅ Fetch Name from Firestore */}
                     <h1 className="font-bold text-2xl">{userData.name}</h1>
 
-                    <h2 className="text-lg">{userData.donorType} (Food Provider)</h2>
+                    <h2 className="text-lg">{userData.organizationType} (Food Distributor)</h2>
                     
                     {/* ✅ Fetch Email from Firestore */}
                     <p className="text-sm">{userData.email}</p>
 
                     {/* ✅ Display Total Donations Count */}
                     <p className="text-sm">
-                        <strong>Total Donations:</strong> {donations.length}
+                        <strong>Total Accepted Donations:</strong> {donations.length}
                     </p>
                     
                     {/* Action Buttons */}
@@ -133,10 +151,10 @@ function NgoDashboard() {
                             <thead className={`${mode === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                 <tr>
                                     <th className="px-6 py-3 text-center">S.No</th>
+                                    <th className="px-6 py-3 text-center">Donor Name</th>
                                     <th className="px-6 py-3 text-center">City</th>
                                     <th className="px-6 py-3 text-center">Date</th>
-                                    <th className="px-6 py-3 text-center">Time</th>
-                                    <th className="px-6 py-3 text-center">Status</th>
+                                    <th className="px-6 py-3 text-center">Food Type</th>
                                     <th className="px-6 py-3 text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -147,28 +165,20 @@ function NgoDashboard() {
                                             ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
                                         >
                                             <td className="px-6 py-4 text-center">{index + 1}.</td>
+                                            <td className="px-6 py-4 text-center">{donation.donorName || "N/A"}</td>
                                             <td className="px-6 py-4 text-center">{donation.city || "N/A"}</td>
-                                            <td className="px-6 py-4 text-center">{donation.date || "N/A"}</td>
                                             <td className="px-6 py-4 text-center">{donation.time || "N/A"}</td>
+                                            <td className="px-6 py-4 text-center">{donation.foodType?.join(", ")}</td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold
-                                                    ${donation.status === 'Pending' ? 'bg-yellow-200 text-black-800' :
-                                                    donation.status === 'Requested by someone' ? 'bg-blue-200 text-blue-800' :
-                                                    donation.status === 'Accepted by you' ? 'bg-green-200 text-green-800' :
-                                                    'bg-gray-200 text-gray-800'}`}
-                                                >
-                                                    {donation.status || "Pending"}
-                                                </span>
+                                            <button 
+                                                onClick={() => openWithdrawDialog(donation.id)}
+                                                className="text-red-600 hover:text-red-800 transition-all"
+                                                title="Withdraw Donation"
+                                            >
+                                                <FiTrash2 size={18} />
+                                            </button>
                                             </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <button 
-                                                    onClick={() => openDeleteDialog(donation)}
-                                                    className="text-red-600 hover:text-red-800 transition-all"
-                                                    title="Delete Donation"
-                                                >
-                                                    <FiTrash2 size={18} />
-                                                </button>
-                                            </td>
+
                                         </tr>
                                     ))
                                 ) : (
@@ -189,15 +199,15 @@ function NgoDashboard() {
 
                 {/* ✅ Confirmation Dialog */}
                 <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-                    <DialogTitle>Confirm Deletion</DialogTitle>
-                    <DialogContent>
-                        Are you sure you want to delete this donation?
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setConfirmOpen(false)}>No</Button>
-                        <Button onClick={handleDeleteDonation} className="bg-red-600 text-white">Yes</Button>
-                    </DialogActions>
-                </Dialog>
+                <DialogTitle>Confirm Withdrawal</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to withdraw this donation?
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmOpen(false)}>No</Button>
+                    <Button onClick={handleWithdrawDonation} className="bg-red-600 text-white">Yes</Button>
+                </DialogActions>
+            </Dialog>
             </div>
         </Layout>
     );

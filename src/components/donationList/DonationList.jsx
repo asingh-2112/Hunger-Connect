@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, getDoc, arrayUnion } from "firebase/firestore";
 import { fireDb } from "../../firebase/FirebaseConfig";
 import { Button, Input, Select, Option } from "@material-tailwind/react";
 import toast from "react-hot-toast";
@@ -20,10 +20,9 @@ const DonationList = () => {
         setLoading(true);
         try {
             const donationsSnap = await getDocs(collection(fireDb, "donations"));
-            const fetchedDonations = donationsSnap.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const fetchedDonations = donationsSnap.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(donation => donation.status === "Pending"); 
             setDonations(fetchedDonations);
             setFilteredDonations(fetchedDonations);
         } catch (error) {
@@ -57,24 +56,57 @@ const DonationList = () => {
             toast.error("You must be logged in to accept donations.");
             return;
         }
-
+    
         try {
+            // Fetch user details from Firestore
+            const userRef = doc(fireDb, "users", storedUser.uid);
+            const userSnap = await getDoc(userRef);
+    
+            if (!userSnap.exists()) {
+                toast.error("User details not found!");
+                return;
+            }
+    
+            const userData = userSnap.data();
+    
             const donationRef = doc(fireDb, "donations", donationId);
+            const donationSnap = await getDoc(donationRef);
+            if (!donationSnap.exists()) {
+                toast.error("Donation not found.");
+                return;
+            }
+            
+            const donationData = donationSnap.data();
             await updateDoc(donationRef, {
                 status: "Accepted",
                 ngoDetails: {
-                    name: storedUser.name,
+                    name: userData.organizationName || "Unknown NGO",  // Retrieved from Firestore
                     email: storedUser.email,
-                    phone: storedUser.phone,
+                    phone: userData.phone || "N/A",  // Retrieved from Firestore
                     ngoId: storedUser.uid,
                 }
             });
 
-            // Update UI instantly
+            // Add accepted donation to NGO's Firestore record
+            await updateDoc(userRef, {
+                donations: arrayUnion({
+                    id: donationId,
+                    donorName: donationData.donorName || "Anonymous",
+                    city: donationData.city,
+                    date: donationData.date,
+                    foodType: donationData.foodType,
+                }),
+            });
+
+            // Remove donation from the displayed list
+            setFilteredDonations((prevDonations) =>
+                prevDonations.filter((donation) => donation.id !== donationId)
+            );
+            
             setDonations(prevDonations =>
                 prevDonations.map(d => (d.id === donationId ? { ...d, status: "Accepted" } : d))
             );
-
+    
             toast.success("Donation accepted successfully!");
         } catch (error) {
             console.error("Error accepting donation:", error);
@@ -91,7 +123,7 @@ const DonationList = () => {
                 <Input
                         type="text"
                         placeholder=" "
-                        label="Filter by city"
+                        label="Search by City"
                         value={cityFilter}
                         onChange={(e) => setCityFilter(e.target.value)}
                         className="peer w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none "
@@ -126,27 +158,26 @@ const DonationList = () => {
                 <table className="w-full border-collapse">
                     <thead className="bg-gray-200">
                         <tr>
-                            <th className="px-4 py-2 text-left">City</th>
-                            <th className="px-4 py-2 text-left">Food Type</th>
-                            <th className="px-4 py-2 text-left">Quantity</th>
-                            <th className="px-4 py-2 text-center">Status</th>
+                            <th className="px-4 py-2 text-center">City</th>
+                            <th className="px-4 py-2 text-center">Food Type</th>
+                            <th className="px-4 py-2 text-center">Estimated Qt.(Kgs)</th>
                             <th className="px-4 py-2 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredDonations.map((donation) => (
                             <tr key={donation.id} className="border-b hover:bg-gray-100">
-                                <td className="px-4 py-2">{donation.city}</td>
-                                <td className="px-4 py-2">{donation.foodType?.join(", ")}</td>
-                                <td className="px-4 py-2">{donation.quantity}</td>
-                                <td className="px-4 py-2 text-center">
-                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold
+                                <td className="px-4 py-2 text-center">{donation.city}</td>
+                                <td className="px-4 py-2 text-center">{donation.foodType?.join(", ")} ({donation.vegNonVeg})</td>
+                                <td className="px-4 py-2 text-center">{donation.quantity}</td>
+                                {/* <td className="px-4 py-2 text-center">
+                                    <span className={px-3 py-1 rounded-full text-sm font-semibold
                                         ${donation.status === "Pending" ? "bg-yellow-200 text-yellow-800" :
                                         donation.status === "Accepted" ? "bg-green-200 text-green-800" :
-                                        "bg-gray-200 text-gray-800"}`}>
+                                        "bg-gray-200 text-gray-800"}}>
                                         {donation.status}
                                     </span>
-                                </td>
+                                </td> */}
                                 <td className="px-4 py-2 text-center">
                                     {donation.status === "Pending" ? (
                                         <Button
