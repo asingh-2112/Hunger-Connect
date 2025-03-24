@@ -23,14 +23,13 @@ const DonationList = () => {
         setDialogOpen(true);
     };
 
-    // Fetch all available donations
     const fetchDonations = async () => {
         setLoading(true);
         try {
             const donationsSnap = await getDocs(collection(fireDb, "donations"));
             const fetchedDonations = donationsSnap.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .filter(donation => donation.status === "Pending"); 
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(donation => donation.status === "Pending"); 
             setDonations(fetchedDonations);
             setFilteredDonations(fetchedDonations);
         } catch (error) {
@@ -40,7 +39,6 @@ const DonationList = () => {
         setLoading(false);
     };
 
-    // Apply filters
     useEffect(() => {
         let filtered = donations;
 
@@ -57,7 +55,6 @@ const DonationList = () => {
         setFilteredDonations(filtered);
     }, [cityFilter, foodFilter, donations]);
 
-    // Accept a donation
     const acceptDonation = async (e, donationId) => {
         e.stopPropagation();
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -67,7 +64,6 @@ const DonationList = () => {
         }
     
         try {
-            // Fetch user details from Firestore
             const userRef = doc(fireDb, "users", storedUser.uid);
             const userSnap = await getDoc(userRef);
     
@@ -89,15 +85,14 @@ const DonationList = () => {
             await updateDoc(donationRef, {
                 status: "Accepted",
                 ngoDetails: {
-                    name: userData.organizationName || "Unknown NGO",  // Retrieved from Firestore
-                    type: userData.organizationType || "Unknown NGO Type",  // Retrieved from Firestore
+                    name: userData.organizationName || "Unknown NGO",
+                    type: userData.organizationType || "Unknown NGO Type",
                     email: storedUser.email,
-                    phone: userData.phone || "N/A",  // Retrieved from Firestore
+                    phone: userData.phone || "N/A",
                     ngoId: storedUser.uid,
                 }
             });
 
-            // Add accepted donation to NGO's Firestore record
             await updateDoc(userRef, {
                 donations: arrayUnion({
                     id: donationId,
@@ -108,7 +103,6 @@ const DonationList = () => {
                 }),
             });
 
-            // Remove donation from the displayed list
             setFilteredDonations((prevDonations) =>
                 prevDonations.filter((donation) => donation.id !== donationId)
             );
@@ -125,91 +119,145 @@ const DonationList = () => {
     };
 
     return (
-        <div>
-            {/* ✅ Fixed Filters Row */}
-            <div className="flex gap-4 mb-4 pt-4">
-                {/* City Filter */}
-                <div className="w-1/2 min-w-0 relative">
-                <Input
-                        type="text"
-                        placeholder=" "
-                        label="Search by City"
-                        value={cityFilter}
-                        onChange={(e) => setCityFilter(e.target.value)}
-                        className="peer w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none "
-                    />
-                    {/* <label className="absolute left-3 top-2 text-gray-500 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-0 peer-focus:text-sm peer-focus:text-blue-500 transition-all">
-                        Filter by City
-                    </label> */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-6 mb-8 border border-blue-100">
+                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
+                    Available Donations
+                </h1>
+                
+                {/* Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <Input
+                            type="text"
+                            label="Search by City"
+                            value={cityFilter}
+                            onChange={(e) => setCityFilter(e.target.value)}
+                            className=" !bg-white"
+                            containerProps={{ className: "min-w-[100px]" }}
+                            color="purple"
+                        />
+                    </div>
+                    <div>
+                        <Select
+                            label="Food Preference"
+                            value={foodFilter}
+                            onChange={(val) => setFoodFilter(val)}
+                            className="!bg-white"
+                            color="purple"
+                        >
+                            <Option value="" className="hover:bg-purple-50">All</Option>
+                            <Option value="Veg" className="hover:bg-green-50">Veg</Option>
+                            <Option value="Non-Veg" className="hover:bg-red-50">Non-Veg</Option>
+                            <Option value="Both" className="hover:bg-yellow-50">Both</Option>
+                        </Select>
+                    </div>
                 </div>
 
-                {/* Food Preference Filter (Fixed Dropdown Alignment) */}
-                <div className="w-1/2 min-w-0">
-                    <Select
-                        label="Food Preference"
-                        value={foodFilter}
-                        onChange={(val) => setFoodFilter(val)}
-                        menuProps={{ className: "absolute w-full left-0 top-full" }} // Fix dropdown alignment
-                        className="w-full truncate"
-                    >
-                        <Option value="">All</Option>
-                        <Option value="Veg">Veg</Option>
-                        <Option value="Non-Veg">Non-Veg</Option>
-                        <Option value="Both">Both</Option>
-                    </Select>
-                </div>
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                    </div>
+                ) : filteredDonations.length === 0 ? (
+                    <div className="text-center py-12 bg-white/70 rounded-lg border border-dashed border-blue-200">
+                        <svg className="mx-auto h-16 w-16 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 className="mt-4 text-xl font-medium text-gray-800">No donations found</h3>
+                        <p className="mt-2 text-gray-600">Try adjusting your search or filter to find what you're looking for.</p>
+                        <button 
+                            onClick={() => {
+                                setCityFilter("");
+                                setFoodFilter("");
+                            }}
+                            className="mt-4 px-4 py-2 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all"
+                        >
+                            Reset Filters
+                        </button>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white/80 backdrop-blur-sm">
+                        <table className="min-w-full divide-y divide-blue-100">
+                            <thead className="bg-gradient-to-r from-blue-500 to-purple-500">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        City
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Food Type
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Quantity (Kgs)
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-blue-50">
+                                {filteredDonations.map((donation) => (
+                                    <tr 
+                                        key={donation.id} 
+                                        className="hover:bg-blue-50/50 cursor-pointer transition-all duration-200"
+                                        onClick={() => handleRowClick(donation)}
+                                    >
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                    <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-semibold text-gray-900">{donation.city}</div>
+                                                    <div className="text-xs text-blue-600">{donation.date}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">
+                                                {donation.foodType?.join(", ")} 
+                                                <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                    ${donation.vegNonVeg === "Veg" ? 'bg-green-100 text-green-800 border border-green-200' : 
+                                                    donation.vegNonVeg === "Non-Veg" ? 'bg-red-100 text-red-800 border border-red-200' : 
+                                                    'bg-yellow-100 text-yellow-800 border border-yellow-200'}`}>
+                                                    {donation.vegNonVeg}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0 h-4 w-4 bg-purple-200 rounded-full mr-2"></div>
+                                                <div className="text-sm font-bold text-purple-700">{donation.quantity} kg</div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            {donation.status === "Pending" ? (
+                                                <Button
+                                                    onClick={(e) => acceptDonation(e, donation.id)}
+                                                    className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                                                    ripple={false}
+                                                >
+                                                    Accept Donation
+                                                </Button>
+                                            ) : (
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-200">
+                                                    <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-600" fill="currentColor" viewBox="0 0 8 8">
+                                                        <circle cx={4} cy={4} r={3} />
+                                                    </svg>
+                                                    Accepted
+                                                </span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
-            {loading ? (
-                <p className="text-center text-gray-500">Loading donations...</p>
-            ) : filteredDonations.length === 0 ? (
-                <p className="text-center text-gray-500">No donations found.</p>
-            ) : (
-                <table className="w-full border-collapse">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="px-4 py-2 text-center">City</th>
-                            <th className="px-4 py-2 text-center">Food Type</th>
-                            <th className="px-4 py-2 text-center">Estimated Qt.(Kgs)</th>
-                            <th className="px-4 py-2 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredDonations.map((donation) => (
-                            <tr key={donation.id} 
-                                className="border-b hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleRowClick(donation)}
-                            >
-                                <td className="px-4 py-2 text-center">{donation.city}</td>
-                                <td className="px-4 py-2 text-center">{donation.foodType?.join(", ")} ({donation.vegNonVeg})</td>
-                                <td className="px-4 py-2 text-center">{donation.quantity}</td>
-                                {/* <td className="px-4 py-2 text-center">
-                                    <span className={px-3 py-1 rounded-full text-sm font-semibold
-                                        ${donation.status === "Pending" ? "bg-yellow-200 text-yellow-800" :
-                                        donation.status === "Accepted" ? "bg-green-200 text-green-800" :
-                                        "bg-gray-200 text-gray-800"}}>
-                                        {donation.status}
-                                    </span>
-                                </td> */}
-                                <td className="px-4 py-2 text-center">
-                                    {donation.status === "Pending" ? (
-                                        <Button
-                                            onClick={(e) => acceptDonation(e,donation.id)}
-                                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                                        >
-                                            Accept
-                                        </Button>
-                                    ) : (
-                                        <span className="text-gray-500">Accepted</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
-
-            {/* Donation Detail Dialog */}
             <DonationDetailDialog
                 open={dialogOpen}
                 onClose={() => setDialogOpen(false)}

@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
     Navbar,
-    Typography,
     IconButton,
     Avatar,
     Collapse,
+    Button
 } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import myContext from "../../context/data/myContext";
 import SearchDialog from "../searchDialog/SearchDialog";
 import ShareDialogBox from "../shareDialogBox/ShareDialogBox";
@@ -15,10 +15,11 @@ export default function Nav() {
     const [openNav, setOpenNav] = useState(false);
     const context = useContext(myContext);
     const { mode, toggleMode } = context;
+    const navigate = useNavigate();
 
-    // Fetch user data from localStorage
+    // Fetch user data
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    const userRole = storedUser?.role; // Get user role
+    const userRole = storedUser?.role;
     const avatarRedirectPath = userRole === "admin"
         ? "/dashboard"
         : userRole === "provider"
@@ -27,123 +28,170 @@ export default function Nav() {
         ? "/ngo-dashboard"
         : "/reg";
 
-    // Navbar Links
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate("/");
+        window.location.reload();
+    };
+
+    // Vibrant gradient colors
+    const navbarBg = mode === 'dark' 
+        ? 'bg-gradient-to-r from-indigo-900 to-purple-900'
+        : 'bg-gradient-to-r from-blue-500 to-purple-600';
+
     const navList = (
-        <ul className="mb-4 mt-2 flex flex-col gap-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-8">
-            <Typography as="li" className="p-1 font-normal">
-                <Link to={'/'} className="flex items-center text-lg hover:text-blue-500 transition-colors duration-300">
+        <ul className="mb-4 mt-2 flex flex-col gap-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
+            <li className="p-1 font-medium">
+                <Link to={'/'} className="flex items-center text-lg text-white hover:text-yellow-300 transition-colors duration-300">
                     Home
                 </Link>
-            </Typography>
-            <Typography as="li" className="p-1 font-normal">
-                <Link to={'/allblogs'} className="flex items-center text-lg hover:text-blue-500 transition-colors duration-300">
+            </li>
+            <li className="p-1 font-medium">
+                <Link to={'/allblogs'} className="flex items-center text-lg text-white hover:text-yellow-300 transition-colors duration-300">
                     Blogs
                 </Link>
-            </Typography>
+            </li>
             {(!storedUser || !userRole) && (
-                <Typography as="li" className="p-1 font-normal">
-                    <Link to={'/adminlogin'} className="flex items-center text-lg hover:text-blue-500 transition-colors duration-300">
+                <li className="p-1 font-medium">
+                    <Link to={'/adminlogin'} className="flex items-center text-lg text-white hover:text-yellow-300 transition-colors duration-300">
                         Sign In
                     </Link>
-                </Typography>
+                </li>
             )}
         </ul>
     );
 
     return (
-        <>
-            {/* Navbar */}
-            <Navbar
-                className="sticky inset-0 z-20 h-max max-w-full border-none rounded-none py-4 px-6 lg:px-8 lg:py-4 backdrop-blur-md bg-opacity-80"
-                style={{
-                    background: mode === 'dark' ? "rgba(30, 41, 59, 0.8)" : '#30336b',
-                    boxShadow: mode === 'dark' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
-                }}
-            >
-                {/* Desktop View */}
-                <div className="flex items-center justify-between">
-                    {/* Home Page Link */}
-                    <Link to={'/'}>
-                        <Typography as="span" className="mr-4 cursor-pointer py-1.5 text-xl font-bold flex gap-2 items-center">
-                            {/* Logo Image */}
-                            <img className='w-30 h-10' src="https://i.imgur.com/gEHDYl2.png" alt="logo" />
-                        </Typography>
-                    </Link>
+        <Navbar
+            className={`sticky top-0 z-50 h-max max-w-full rounded-none border-none py-3 px-6 lg:px-8 lg:py-4 ${navbarBg} shadow-lg`}
+            blurred={false}
+            fullWidth
+        >
+            <div className="flex items-center justify-between">
+                {/* Logo */}
+                <Link to={'/'} className="flex items-center">
+                    <img 
+                        className="h-10" 
+                        src="https://i.imgur.com/gEHDYl2.png" 
+                        alt="FoodShare logo" 
+                    />
+                </Link>
 
-                    {/* Navbar Items */}
-                    <div className="flex items-center gap-6">
-                        <div className="hidden lg:block">{navList}</div>
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex items-center gap-6">
+                    {navList}
 
-                        {/* Search & Share Icons */}
-                        <div className="hidden lg:flex items-center gap-4">
-                            <SearchDialog />
-                            <ShareDialogBox />
-                        </div>
+                    <div className="flex items-center gap-4">
+                        <SearchDialog />
+                        <ShareDialogBox />
 
-                        {/* Show Avatar if User is Logged In */}
-                        {storedUser && userRole && (
+                        {/* Theme Toggle */}
+                        <IconButton
+                            variant="text"
+                            onClick={toggleMode}
+                            className="rounded-full text-white hover:bg-white/20"
+                        >
+                            {mode === 'light' ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                    <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                    <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                        </IconButton>
+
+                        {/* User Avatar - Now directly navigates without dropdown */}
+                        {storedUser ? (
                             <Link to={avatarRedirectPath}>
                                 <Avatar
                                     src={'https://cdn-icons-png.flaticon.com/128/3135/3135715.png'}
                                     alt="User Avatar"
-                                    withBorder={true}
-                                    className="p-0.5 w-10 h-10 hover:scale-110 transition-transform duration-300"
-                                    style={{
-                                        border: mode === 'dark'
-                                            ? '2px solid rgb(226, 232, 240)'
-                                            : '2px solid rgb(30, 41, 59)'
-                                    }}
+                                    size="sm"
+                                    className="cursor-pointer border-2 border-white hover:border-yellow-300 transition-all"
                                 />
                             </Link>
+                        ) : (
+                            <Button 
+                                variant="filled" 
+                                size="sm" 
+                                color="yellow"
+                                className="hidden lg:inline-block"
+                                onClick={() => navigate('/adminlogin')}
+                            >
+                                Sign In
+                            </Button>
                         )}
-
-                        {/* Dark & Light Mode Toggle */}
-                        <IconButton
-                            onClick={toggleMode}
-                            className="lg:inline-block rounded-full hover:bg-opacity-20 transition-colors duration-300"
-                            style={{
-                                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                            }}
-                        >
-                            {mode === 'light' ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-black">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-                                </svg>
-                            )}
-                        </IconButton>
-
-                        {/* Mobile Menu Toggle */}
-                        <IconButton
-                            className="ml-auto h-10 w-10 text-inherit rounded-lg lg:hidden"
-                            onClick={() => setOpenNav(!openNav)}
-                            style={{
-                                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                            }}
-                        >
-                            {openNav ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            )}
-                        </IconButton>
                     </div>
                 </div>
 
-                {/* Mobile View */}
-                <Collapse open={openNav} className="lg:hidden">
-                    <div className="mt-4">
-                        {navList}
+                {/* Mobile Menu Button */}
+                <div className="flex items-center gap-4 lg:hidden">
+                    <SearchDialog mobile={true} />
+                    <IconButton
+                        variant="text"
+                        onClick={() => setOpenNav(!openNav)}
+                        className="text-white hover:bg-white/20"
+                    >
+                        {openNav ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        )}
+                    </IconButton>
+                </div>
+            </div>
+
+            {/* Mobile Menu */}
+            <Collapse open={openNav} className="lg:hidden">
+                <div className="pt-4 pb-2">
+                    {navList}
+                    <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                        <div className="flex items-center gap-2">
+                            <IconButton
+                                variant="text"
+                                onClick={toggleMode}
+                                className="text-white hover:bg-white/20"
+                            >
+                                {mode === 'light' ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                        <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+                                    </svg>
+                                )}
+                            </IconButton>
+                            <ShareDialogBox mobile={true} />
+                        </div>
+                        {storedUser ? (
+                            <Link to={avatarRedirectPath}>
+                                <Avatar
+                                    src={'https://cdn-icons-png.flaticon.com/128/3135/3135715.png'}
+                                    alt="User Avatar"
+                                    size="sm"
+                                    className="border-2 border-white"
+                                />
+                            </Link>
+                        ) : (
+                            <Button 
+                                variant="filled" 
+                                size="sm" 
+                                color="yellow"
+                                onClick={() => navigate('/adminlogin')}
+                            >
+                                Sign In
+                            </Button>
+                        )}
                     </div>
-                </Collapse>
-            </Navbar>
-        </>
+                </div>
+            </Collapse>
+        </Navbar>
     );
 }

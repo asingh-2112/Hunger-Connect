@@ -4,39 +4,47 @@ import myContext from '../../context/data/myContext';
 function Footer() {
     const context = useContext(myContext);
     const { mode } = context;
+    
+    // Vibrant gradient colors
+    const footerBg = mode === 'dark' 
+        ? 'bg-gradient-to-r from-indigo-900 to-purple-900'
+        : 'bg-gradient-to-r from-blue-500 to-purple-600';
+
     return (
-        <footer className="body-font" style={{ background: mode === 'dark' ? 'rgb(30, 41, 59)' : '#30336b' }}>
-            {/* Left Content  */}
-            <div className="container px-5 py-3 mx-auto flex items-center sm:flex-row flex-col">
-                {/* Blog Logo  */}
-                <div className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
-                    {/* logo  */}
-                    <img className='w-[200px]'
-                        src="https://i.imgur.com/gEHDYl2.png" alt="logo"
+        <footer className={`body-font ${footerBg} text-white`}>
+            <div className="container px-5 py-8 mx-auto flex flex-col sm:flex-row items-center">
+                {/* Logo Section */}
+                <div className="flex items-center justify-center md:justify-start">
+                    <img 
+                        className='w-40' 
+                        src="https://i.imgur.com/gEHDYl2.png" 
+                        alt="HungerConnect logo"
                     />
-                    {/* logo text  */}
-                    {/* <span className="ml-3 text-xl text-white">
-                        HungerConnect
-                    </span> */}
                 </div>
 
-                {/* items  */}
-                <p className="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">
-                    © 2023 HungerConnect —
-                    <a
-                        href="https://twitter.com/knyttneve"
-                        className="text-gray-600 ml-1"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                    >
-                        @hungerconnect
-                    </a>
-                </p>
+                {/* Copyright Text */}
+                <div className="flex-1 text-center sm:text-left mt-4 sm:mt-0">
+                    <p className="text-sm text-white/80">
+                        © {new Date().getFullYear()} HungerConnect —
+                        <a
+                            href="https://twitter.com/hungerconnect"
+                            className="text-white ml-1 hover:text-yellow-300 transition-colors"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            @hungerconnect
+                        </a>
+                    </p>
+                </div>
                 
-                {/* Right item  */}
-                <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
-                    {/* Icon 1  */}
-                    <a className="text-gray-500">
+                {/* Social Icons */}
+                <div className="flex justify-center sm:justify-end mt-4 sm:mt-0">
+                    {/* Facebook */}
+                    <a 
+                        href="#" 
+                        className="ml-4 text-white hover:text-yellow-300 transition-colors"
+                        aria-label="Facebook"
+                    >
                         <svg
                             fill="currentColor"
                             strokeLinecap="round"
@@ -49,8 +57,12 @@ function Footer() {
                         </svg>
                     </a>
 
-                    {/* Icon 2  */}
-                    <a className="ml-3 text-gray-500">
+                    {/* Twitter */}
+                    <a 
+                        href="#" 
+                        className="ml-4 text-white hover:text-yellow-300 transition-colors"
+                        aria-label="Twitter"
+                    >
                         <svg
                             fill="currentColor"
                             strokeLinecap="round"
@@ -63,8 +75,12 @@ function Footer() {
                         </svg>
                     </a>
 
-                    {/* Icon 3  */}
-                    <a className="ml-3 text-gray-500">
+                    {/* Instagram */}
+                    <a 
+                        href="#" 
+                        className="ml-4 text-white hover:text-yellow-300 transition-colors"
+                        aria-label="Instagram"
+                    >
                         <svg
                             fill="none"
                             stroke="currentColor"
@@ -79,8 +95,12 @@ function Footer() {
                         </svg>
                     </a>
 
-                    {/* Icon 4  */}
-                    <a className="ml-3 text-gray-500">
+                    {/* LinkedIn */}
+                    <a 
+                        href="#" 
+                        className="ml-4 text-white hover:text-yellow-300 transition-colors"
+                        aria-label="LinkedIn"
+                    >
                         <svg
                             fill="currentColor"
                             stroke="currentColor"
@@ -97,11 +117,21 @@ function Footer() {
                             <circle cx={4} cy={4} r={2} stroke="none" />
                         </svg>
                     </a>
-                </span>
+                </div>
+            </div>
+
+            {/* Additional Links */}
+            <div className="container px-5 py-4 mx-auto border-t border-white/10">
+                <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-sm">
+                    <a href="#" className="text-white/80 hover:text-yellow-300 transition-colors">Privacy Policy</a>
+                    <span className="hidden md:block text-white/30">•</span>
+                    <a href="#" className="text-white/80 hover:text-yellow-300 transition-colors">Terms of Service</a>
+                    <span className="hidden md:block text-white/30">•</span>
+                    <a href="#" className="text-white/80 hover:text-yellow-300 transition-colors">Contact Us</a>
+                </div>
             </div>
         </footer>
-
     )
 }
 
-export default Footer
+export default Footer;

@@ -1,5 +1,4 @@
-import { Button } from "@material-tailwind/react";
-
+import { Button, Radio, Checkbox, Typography, Input } from "@material-tailwind/react";
 const FOOD_TYPES = {
     PACKED: "Packed",
     COOKED: "Cooked",
@@ -10,8 +9,7 @@ const FOOD_PREFERENCES = {
     NON_VEG: "Non-Veg",
     BOTH: "Both",
 };
-
-const FoodPreferenceStep = ({ formData, handleInputChange, handleNextStep,errors }) => {
+const FoodPreferenceStep = ({ formData, handleInputChange, handleNextStep, errors }) => {
     const handleCheckboxChange = (foodType) => {
         const updatedFoodType = formData.foodType.includes(foodType)
             ? formData.foodType.filter((type) => type !== foodType)
@@ -21,54 +19,80 @@ const FoodPreferenceStep = ({ formData, handleInputChange, handleNextStep,errors
     };
 
     return (
-        <div className="flex flex-col gap-4">
-            <h3 className="font-bold text-lg mb-0">Veg/Non-Veg</h3>
-            <div className="flex gap-4">
-                {Object.values(FOOD_PREFERENCES).map((pref) => (
-                    <label key={pref}>
-                        <input
-                            type="radio"
+        <div className="space-y-6">
+            <div>
+                <Typography variant="h6" color="blue-gray" className="mb-3">
+                    Food Preference
+                </Typography>
+                <div className="flex gap-6">
+                    {Object.entries(FOOD_PREFERENCES).map(([key, pref]) => (
+                        <Radio
+                            key={key}
                             name="vegNonVeg"
+                            label={pref}
                             value={pref}
                             checked={formData.vegNonVeg === pref}
                             onChange={handleInputChange}
-                        />{" "}
-                        {pref}
-                    </label>
-                ))}
+                            className="border-gray-300"
+                        />
+                    ))}
+                </div>
+                {errors.vegNonVeg && (
+                    <Typography variant="small" color="red" className="mt-1">
+                        {errors.vegNonVeg}
+                    </Typography>
+                )}
             </div>
-            {errors.vegNonVeg && <p className="text-red-500 text-sm">{errors.vegNonVeg}</p>}
-            <h3 className="font-bold text-lg mb-1">Food Type</h3>
-            <div className="flex space-x-4">
-                {Object.values(FOOD_TYPES).map((type) => (
-                    <label key={type}>
-                        <input
-                            type="checkbox"
+
+            <div>
+                <Typography variant="h6" color="blue-gray" className="mb-3">
+                    Food Type
+                </Typography>
+                <div className="flex gap-6">
+                    {Object.entries(FOOD_TYPES).map(([key, type]) => (
+                        <Checkbox
+                            key={key}
+                            label={type}
                             checked={formData.foodType.includes(type)}
                             onChange={() => handleCheckboxChange(type)}
-                        />{" "}
-                        {type}
-                    </label>
-                ))}
+                        />
+                    ))}
+                </div>
+                {errors.foodType && (
+                    <Typography variant="small" color="red" className="mt-1">
+                        {errors.foodType}
+                    </Typography>
+                )}
             </div>
-            {errors.foodType && <p className="text-red-500 text-sm">{errors.foodType}</p>}
-            <h3 className="font-bold text-lg mb-1">Food Quantity (in Kgs)</h3>
-            <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                    <span>Estimate Quantity:</span>
-                    <input
+
+            <div>
+                <Typography variant="h6" color="blue-gray" className="mb-3">
+                    Food Quantity (in Kgs)
+                </Typography>
+                <div className="w-1/3">
+                    <Input
                         type="number"
                         name="quantity"
+                        label="Quantity"
                         value={formData.quantity || ""}
                         onChange={handleInputChange}
                         min="1"
                         max="100"
-                        className="w-20 border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        error={!!errors.quantity}
                     />
-                </label>
+                    {errors.quantity && (
+                        <Typography variant="small" color="red" className="mt-1">
+                            {errors.quantity}
+                        </Typography>
+                    )}
+                </div>
             </div>
-            {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity}</p>}
-            <Button onClick={handleNextStep}>Next</Button>
+
+            <div className="flex justify-end">
+                <Button onClick={handleNextStep} color="blue">
+                    Next
+                </Button>
+            </div>
         </div>
     );
 };

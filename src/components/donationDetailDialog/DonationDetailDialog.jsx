@@ -108,7 +108,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Person sx={iconStyle} />
+                    <Person sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Donor Name</Typography>
                       <Typography variant="body1" fontWeight={500}>{selectedDonation.donorName}</Typography>
@@ -118,7 +118,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <LocationOn sx={iconStyle} />
+                    <LocationOn sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">City</Typography>
                       <Typography variant="body1" fontWeight={500}>{selectedDonation.city}</Typography>
@@ -128,7 +128,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Event sx={iconStyle} />
+                    <Event sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Date</Typography>
                       <Typography variant="body1" fontWeight={500}>{selectedDonation.date}</Typography>
@@ -138,7 +138,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <AccessTime sx={iconStyle} />
+                    <AccessTime sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Time</Typography>
                       <Typography variant="body1" fontWeight={500}>{selectedDonation.time}</Typography>
@@ -177,7 +177,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Fastfood sx={iconStyle} />
+                    <Fastfood sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Food Type</Typography>
                       <Typography variant="body1" fontWeight={500}>
@@ -189,7 +189,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Scale sx={iconStyle} />
+                    <Scale sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Quantity</Typography>
                       <Typography variant="body1" fontWeight={500}>{selectedDonation.quantity} kgs</Typography>
@@ -228,7 +228,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Email sx={iconStyle} />
+                    <Email sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Email</Typography>
                       <Typography variant="body1" fontWeight={500}>{selectedDonation.email}</Typography>
@@ -238,7 +238,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Phone sx={iconStyle} />
+                    <Phone sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Phone Number</Typography>
                       <Typography variant="body1" fontWeight={500}>
@@ -251,9 +251,9 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12} md={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <HourglassTop sx={iconStyle} />
+                    <HourglassTop  sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
-                      <Typography variant="caption" color="textSecondary">Status</Typography>
+                      <Typography variant="caption" color="textSecondary">Status </Typography>
                       <Chip 
                         label={selectedDonation.status || "Pending"} 
                         sx={{ 
@@ -268,7 +268,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                    <Chat sx={iconStyle} />
+                    <Chat sx={{ fontSize: 30, ...iconStyle }} />
                     <Box>
                       <Typography variant="caption" color="textSecondary">Message from Donor</Typography>
                       <Typography variant="body1" fontWeight={500} sx={{ fontStyle: selectedDonation.message ? 'normal' : 'italic' }}>
@@ -309,7 +309,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Person sx={iconStyle} />
+                      <Person sx={{ fontSize: 30, ...iconStyle }} />
                       <Box>
                         <Typography variant="caption" color="textSecondary">Organization Name</Typography>
                         <Typography variant="body1" fontWeight={500}>{selectedDonation.ngoDetails.name}</Typography>
@@ -319,7 +319,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                   
                   <Grid item xs={12} md={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Business sx={iconStyle} />
+                      <Business sx={{ fontSize: 30, ...iconStyle }} />
                       <Box>
                         <Typography variant="caption" color="textSecondary">Organization Type</Typography>
                         <Typography variant="body1" fontWeight={500}>{selectedDonation.ngoDetails.type}</Typography>
@@ -329,7 +329,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                   
                   <Grid item xs={12} md={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Email sx={iconStyle} />
+                      <Email sx={{ fontSize: 30, ...iconStyle }} />
                       <Box>
                         <Typography variant="caption" color="textSecondary">Email</Typography>
                         <Typography variant="body1" fontWeight={500}>{selectedDonation.ngoDetails.email}</Typography>
@@ -339,7 +339,7 @@ function DonationDetailDialog({ open, onClose, selectedDonation }) {
                   
                   <Grid item xs={12} md={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Phone sx={iconStyle} />
+                      <Phone sx={{ fontSize: 30, ...iconStyle }} />
                       <Box>
                         <Typography variant="caption" color="textSecondary">Phone</Typography>
                         <Typography variant="body1" fontWeight={500}>{selectedDonation.ngoDetails.phone}</Typography>

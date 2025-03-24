@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import { Button, Textarea, Typography } from "@material-tailwind/react";
 
 const MessageStep = ({
     formData,
@@ -6,24 +6,34 @@ const MessageStep = ({
     handlePreviousStep,
     handleSubmit,
     errors,
-    setErrors,
 }) => (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="font-bold text-lg">Message</label>
-        <textarea
+    <div className="space-y-4">
+        <Typography variant="h5" color="blue-gray" className="mb-4">
+            Final Details
+        </Typography>
+
+        <Textarea
             name="message"
+            label="Additional Message (Optional)"
             value={formData.message || ""}
             onChange={handleInputChange}
-            placeholder="Enter your message here..."
-            rows="4"
-            className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        ></textarea>
-        {errors.message && <p className="text-red-500 text-sm">{errors.message}</p>}
-        <div className="flex gap-4">
-            <Button type="button" onClick={handlePreviousStep}>Back</Button>
-            <Button type="submit">Submit</Button>
+            error={!!errors.message}
+        />
+        {errors.message && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.message}
+            </Typography>
+        )}
+
+        <div className="flex justify-between pt-4">
+            <Button variant="outlined" onClick={handlePreviousStep}>
+                Back
+            </Button>
+            <Button onClick={handleSubmit} color="green">
+                Submit Donation
+            </Button>
         </div>
-    </form>
+    </div>
 );
 
 export default MessageStep;

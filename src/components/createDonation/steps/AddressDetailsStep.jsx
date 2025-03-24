@@ -1,4 +1,5 @@
-import { Button, Input } from "@material-tailwind/react";
+import { Button, Input, Select, Option, Typography } from "@material-tailwind/react";
+
 const statesAndDistricts = {
     "Andhra Pradesh": ["Anantapur","Chittoor","East Godavari","Guntur","Kadapa","Krishna","Kurnool","Prakasam","Nellore","Srikakulam","Visakhapatnam","Vizianagaram","West Godavari"],
     "Arunachal Pradesh": ["Anjaw","Changlang","Dibang Valley","East Kameng","East Siang","Kra Daadi","Kurung Kumey","Lohit","Longding","Lower Dibang Valley","Lower Subansiri","Namsai","Papum Pare","Siang","Tawang","Tirap","Upper Siang","Upper Subansiri","West Kameng","West Siang","Itanagar"],
@@ -45,73 +46,107 @@ const AddressDetailsStep = ({
     handleNextStep,
     districtOptions,
     errors,
-    setErrors,
 }) => (
-    <div className="flex flex-col gap-4">
-        <h3 className="font-medium">Step 2: Address Details</h3>
+    <div className="space-y-4">
+        <Typography variant="h5" color="blue-gray" className="mb-4">
+            Address Details
+        </Typography>
+
         <Input
             name="street"
             label="Plot No./Street Address"
             value={formData.street}
             onChange={handleInputChange}
-            required
+            error={!!errors.street}
         />
-        {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
+        {errors.street && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.street}
+            </Typography>
+        )}
+
         <Input
             name="locality"
             label="Locality"
             value={formData.locality}
             onChange={handleInputChange}
-            required
+            error={!!errors.locality}
         />
-        {errors.locality && <p className="text-red-500 text-sm">{errors.locality}</p>}
+        {errors.locality && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.locality}
+            </Typography>
+        )}
+
         <Input
             type="number"
             name="pincode"
             label="Pincode"
             value={formData.pincode}
             onChange={handleInputChange}
-            required
+            error={!!errors.pincode}
         />
-        {errors.pincode && <p className="text-red-500 text-sm">{errors.pincode}</p>}
-        <select
+        {errors.pincode && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.pincode}
+            </Typography>
+        )}
+
+        <Select
             name="state"
+            label="State"
             value={formData.state}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-            required
+            onChange={(value) => handleInputChange({ target: { name: "state", value } })}
+            error={!!errors.state}
         >
-            <option value="">Select State</option>
             {Object.keys(statesAndDistricts).map((state) => (
-                <option key={state} value={state}>
+                <Option key={state} value={state}>
                     {state}
-                </option>
+                </Option>
             ))}
-        </select>
-        {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
-        <select
+        </Select>
+        {errors.state && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.state}
+            </Typography>
+        )}
+
+        <Select
             name="district"
+            label="District"
             value={formData.district}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
+            onChange={(value) => handleInputChange({ target: { name: "district", value } })}
             disabled={!formData.state}
-            required
+            error={!!errors.district}
         >
-            <option value="">Select District</option>
             {districtOptions}
-        </select>
-        {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
+        </Select>
+        {errors.district && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.district}
+            </Typography>
+        )}
+
         <Input
             name="city"
             label="City"
             value={formData.city}
             onChange={handleInputChange}
-            required
+            error={!!errors.city}
         />
-        {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
-        <div className="flex gap-4">
-            <Button onClick={handlePreviousStep}>Back</Button>
-            <Button onClick={handleNextStep}>Next</Button>
+        {errors.city && (
+            <Typography variant="small" color="red" className="mt-1">
+                {errors.city}
+            </Typography>
+        )}
+
+        <div className="flex justify-between pt-4">
+            <Button variant="outlined" onClick={handlePreviousStep}>
+                Back
+            </Button>
+            <Button onClick={handleNextStep} color="blue">
+                Next
+            </Button>
         </div>
     </div>
 );
