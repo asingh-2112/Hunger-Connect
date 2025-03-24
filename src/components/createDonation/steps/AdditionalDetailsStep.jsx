@@ -15,6 +15,15 @@ const AdditionalDetailsStep = ({
         <Input type="time" name="time" label="Pickup Time (At what time will the food be collected?)" value={formData.time} onChange={handleInputChange} required />
         {errors.time && <p className="text-red-500 text-sm">{errors.time}</p>}
         <Input
+            type="email"
+            name="email"
+            label="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+        />
+        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+        <Input
             type="tel"
             name="phoneNumber"
             label="Phone Number"
