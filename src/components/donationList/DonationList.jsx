@@ -3,6 +3,7 @@ import { collection, getDocs, updateDoc, doc, getDoc, arrayUnion } from "firebas
 import { fireDb } from "../../firebase/FirebaseConfig";
 import { Button, Input, Select, Option } from "@material-tailwind/react";
 import toast from "react-hot-toast";
+import DonationDetailDialog from "../donationDetailDialog/DonationDetailDialog";
 
 const DonationList = () => {
     const [donations, setDonations] = useState([]);
@@ -10,10 +11,17 @@ const DonationList = () => {
     const [loading, setLoading] = useState(true);
     const [cityFilter, setCityFilter] = useState("");
     const [foodFilter, setFoodFilter] = useState("");
+    const [selectedDonation, setSelectedDonation] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchDonations();
     }, []);
+
+    const handleRowClick = (donation) => {
+        setSelectedDonation(donation);
+        setDialogOpen(true);
+    };
 
     // Fetch all available donations
     const fetchDonations = async () => {
@@ -50,7 +58,8 @@ const DonationList = () => {
     }, [cityFilter, foodFilter, donations]);
 
     // Accept a donation
-    const acceptDonation = async (donationId) => {
+    const acceptDonation = async (e, donationId) => {
+        e.stopPropagation();
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser) {
             toast.error("You must be logged in to accept donations.");
@@ -81,6 +90,7 @@ const DonationList = () => {
                 status: "Accepted",
                 ngoDetails: {
                     name: userData.organizationName || "Unknown NGO",  // Retrieved from Firestore
+                    type: userData.organizationType || "Unknown NGO Type",  // Retrieved from Firestore
                     email: storedUser.email,
                     phone: userData.phone || "N/A",  // Retrieved from Firestore
                     ngoId: storedUser.uid,
@@ -166,7 +176,10 @@ const DonationList = () => {
                     </thead>
                     <tbody>
                         {filteredDonations.map((donation) => (
-                            <tr key={donation.id} className="border-b hover:bg-gray-100">
+                            <tr key={donation.id} 
+                                className="border-b hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleRowClick(donation)}
+                            >
                                 <td className="px-4 py-2 text-center">{donation.city}</td>
                                 <td className="px-4 py-2 text-center">{donation.foodType?.join(", ")} ({donation.vegNonVeg})</td>
                                 <td className="px-4 py-2 text-center">{donation.quantity}</td>
@@ -181,7 +194,7 @@ const DonationList = () => {
                                 <td className="px-4 py-2 text-center">
                                     {donation.status === "Pending" ? (
                                         <Button
-                                            onClick={() => acceptDonation(donation.id)}
+                                            onClick={(e) => acceptDonation(e,donation.id)}
                                             className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                                         >
                                             Accept
@@ -195,6 +208,13 @@ const DonationList = () => {
                     </tbody>
                 </table>
             )}
+
+            {/* Donation Detail Dialog */}
+            <DonationDetailDialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                selectedDonation={selectedDonation}
+            />
         </div>
     );
 };

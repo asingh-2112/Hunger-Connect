@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Layout from "../../../components/layout/Layout";
 import { Button } from "@material-tailwind/react";
-import { doc, onSnapshot, updateDoc, arrayRemove, collection } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, arrayRemove, collection, getDoc } from "firebase/firestore";
 import { fireDb } from "../../../firebase/FirebaseConfig";
 import { Link, useNavigate } from "react-router-dom";
 import myContext from "../../../context/data/myContext";
@@ -12,6 +12,7 @@ import CreateDonation from "../../../components/createDonation/CreateDonation";
 import { toast } from "react-hot-toast";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import SearchButton from "../../../components/searchButton/SearchButton";
+import DonationDetailDialog from "../../../components/donationDetailDialog/DonationDetailDialog";
 
 function NgoDashboard() {
     const navigate = useNavigate();
@@ -22,6 +23,8 @@ function NgoDashboard() {
     const [open, setOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedDonationId, setSelectedDonationId] = useState(null);
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+    const [selectedDonation, setSelectedDonation] = useState(null);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -64,9 +67,33 @@ function NgoDashboard() {
     };
 
     // Open confirmation dialog and store selected donation ID
-    const openWithdrawDialog = (donationId) => {
+    const openWithdrawDialog = (donationId, e) => {
+        e.stopPropagation(); // Prevent triggering the row click
         setSelectedDonationId(donationId);
         setConfirmOpen(true);
+    };
+
+    // Open detail dialog
+    const openDetailDialog = async (donation) => {
+        try {
+            // Fetch the full donation data from Firestore
+            const donationRef = doc(fireDb, "donations", donation.id);
+            const donationSnap = await getDoc(donationRef);
+            
+            if (donationSnap.exists()) {
+                setSelectedDonation({ id: donationSnap.id, ...donationSnap.data() });
+            } else {
+                // Fallback to the data we have if the document doesn't exist
+                setSelectedDonation(donation);
+            }
+            setDetailDialogOpen(true);
+        } catch (error) {
+            console.error("Error fetching donation details:", error);
+            toast.error("Failed to load donation details");
+            // Fallback to the data we have
+            setSelectedDonation(donation);
+            setDetailDialogOpen(true);
+        }
     };
 
     // Withdraw function
@@ -81,8 +108,7 @@ function NgoDashboard() {
         }
 
         try {
-            
-            const donationId= selectedDonationId;
+            const donationId = selectedDonationId;
             console.log(selectedDonationId);
             const donationRef = doc(fireDb, "donations", donationId);
             await updateDoc(donationRef, {
@@ -174,8 +200,11 @@ function NgoDashboard() {
                             <tbody>
                                 {donations.length > 0 ? (
                                     donations.map((donation, index) => (
-                                        <tr key={index} className={`border-b transition-all
-                                            ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
+                                        <tr 
+                                            key={donation.id} 
+                                            className={`border-b transition-all cursor-pointer
+                                                ${mode === 'dark' ? 'border-gray-700 bg-gray-900 hover:bg-gray-800' : 'border-gray-300 bg-white hover:bg-gray-100'}`}
+                                            onClick={() => openDetailDialog(donation)}
                                         >
                                             <td className="px-6 py-4 text-center">{index + 1}.</td>
                                             <td className="px-6 py-4 text-center">{donation.donorName || "N/A"}</td>
@@ -183,15 +212,14 @@ function NgoDashboard() {
                                             <td className="px-6 py-4 text-center">{donation.time || "N/A"}</td>
                                             <td className="px-6 py-4 text-center">{donation.foodType?.join(", ")}</td>
                                             <td className="px-6 py-4 text-center">
-                                            <button 
-                                                onClick={() => openWithdrawDialog(donation.id)}
-                                                className="text-red-600 hover:text-red-800 transition-all"
-                                                title="Withdraw Donation"
-                                            >
-                                                <FiTrash2 size={18} />
-                                            </button>
+                                                <button 
+                                                    onClick={(e) => openWithdrawDialog(donation.id, e)}
+                                                    className="text-red-600 hover:text-red-800 transition-all"
+                                                    title="Withdraw Donation"
+                                                >
+                                                    <FiTrash2 size={18} />
+                                                </button>
                                             </td>
-
                                         </tr>
                                     ))
                                 ) : (
@@ -204,23 +232,30 @@ function NgoDashboard() {
                     </div>
                 </div>
 
-                {/* ✅ Plus Button to Open Modal */}
+                {/* Plus Button to Open Modal */}
                 <SearchButton onClick={() => setOpen(true)} />
 
-                {/* ✅ Create Donation Modal */}
+                {/* Create Donation Modal */}
                 <CreateDonation open={open} setOpen={setOpen} />
 
-                {/* ✅ Confirmation Dialog */}
+                {/* Confirmation Dialog */}
                 <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-                <DialogTitle>Confirm Withdrawal</DialogTitle>
-                <DialogContent>
-                    Are you sure you want to withdraw this donation?
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setConfirmOpen(false)}>No</Button>
-                    <Button onClick={handleWithdrawDonation} className="bg-red-600 text-white">Yes</Button>
-                </DialogActions>
-            </Dialog>
+                    <DialogTitle>Confirm Withdrawal</DialogTitle>
+                    <DialogContent>
+                        Are you sure you want to withdraw this donation?
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setConfirmOpen(false)}>No</Button>
+                        <Button onClick={handleWithdrawDonation} className="bg-red-600 text-white">Yes</Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Donation Detail Dialog */}
+                <DonationDetailDialog 
+                    open={detailDialogOpen} 
+                    onClose={() => setDetailDialogOpen(false)} 
+                    selectedDonation={selectedDonation}
+                />
             </div>
         </Layout>
     );
