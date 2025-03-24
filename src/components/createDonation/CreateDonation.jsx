@@ -78,6 +78,7 @@ const CreateDonation = ({ open, setOpen }) => {
         pincode: "",
         phoneNumber: "",
         alternatePhoneNumber: "",
+        email: "",
         date: "",
         time: "",
         message: "",
@@ -111,6 +112,7 @@ const CreateDonation = ({ open, setOpen }) => {
                             pincode: userData.pinCode || "",
                             phoneNumber: userData.phone || "",
                             alternatePhoneNumber: userData.alternatePhoneNumber || "",
+                            email: userData.email || "",
                             donorId: userData.uid,
                         }));
                     }
@@ -195,6 +197,9 @@ const CreateDonation = ({ open, setOpen }) => {
                 }
                 if (formData.alternatePhoneNumber && !/^\d{10}$/.test(formData.alternatePhoneNumber)) {
                     newErrors.alternatePhoneNumber = "Alternate phone number must be 10 digits.";
+                }
+                if (!formData.email) {
+                    newErrors.date = "Email is required.";
                 }
                 if (!formData.date) {
                     newErrors.date = "Date is required.";
@@ -286,6 +291,7 @@ const CreateDonation = ({ open, setOpen }) => {
                 pincode: "",
                 phoneNumber: "",
                 alternatePhoneNumber: "",
+                email: "",
                 date: "",
                 time: "",
                 message: "",
