@@ -12,6 +12,7 @@ import CreateDonation from "../../../components/createDonation/CreateDonation";
 import { toast } from "react-hot-toast";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, Box, Divider, Grid } from "@mui/material";
 import { Email, Phone, LocationOn, Event, AccessTime, Fastfood, Inventory2 } from "@mui/icons-material";
+import DonationDetailDialog from "../../../components/donationDetailDialog/DonationDetailDialog";
 
 
 function DonorDashboard() {
@@ -91,12 +92,13 @@ const fetchDonations = async () => {
         navigate("/");
     };
 
-    const openDeleteDialog = (donation) => {
+    const openDeleteDialog = (e, donation) => {
+        e.stopPropagation(); // Stop event propagation
         setSelectedDonation(donation);
         setConfirmOpen(true);
     };
 
-    const openDonationDialog = async (donation) => {
+    const openDonationDialog = (donation) => {
         setSelectedDonation(donation);
         setDonationDialogOpen(true);
     };
@@ -206,7 +208,7 @@ const fetchDonations = async () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <button onClick={() => openDeleteDialog(donation)} className="text-red-600 hover:text-red-800 transition-all" title="Delete Donation">
+                                                <button onClick={(e) => openDeleteDialog(e,donation)} className="text-red-600 hover:text-red-800 transition-all" title="Delete Donation">
                                                     <FiTrash2 size={18} />
                                                 </button>
                                             </td>
@@ -234,56 +236,11 @@ const fetchDonations = async () => {
                 </Dialog>
 
                 {/* Donation Details Dialog */}
-                <Dialog open={donationDialogOpen} onClose={() => setDonationDialogOpen(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>Donation Details</DialogTitle>
-                    <DialogContent>
-                        {selectedDonation && (
-                            <Box sx={{ p: 2 }}>
-                                <Grid container spacing={2} alignItems="center">
-                                    <Grid item xs={6}>
-                                        <Typography variant="body1"><LocationOn sx={{ verticalAlign: "middle" }} /> <strong>City:</strong> {selectedDonation.city}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body1"><Event sx={{ verticalAlign: "middle" }} /> <strong>Date:</strong> {selectedDonation.date}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body1"><AccessTime sx={{ verticalAlign: "middle" }} /> <strong>Time:</strong> {selectedDonation.time}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body1"><Fastfood sx={{ verticalAlign: "middle" }} /> <strong>Food Type:</strong> {selectedDonation.foodType?.join(", ")} ({selectedDonation.vegNonVeg})</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body1"><Inventory2 sx={{ verticalAlign: "middle" }} /> <strong>Quantity:</strong> {selectedDonation.quantity}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Typography variant="body1"><strong>Status:</strong> {selectedDonation.status}</Typography>
-                                    </Grid>
-                                </Grid>
-
-                                {selectedDonation.status === "Accepted" && selectedDonation.ngoDetails && (
-                                    <>
-                                        <Divider sx={{ my: 2 }} />
-                                        <Typography variant="h6" sx={{ fontWeight: "bold", textAlign: "center" }}>NGO Details</Typography>
-                                        <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-                                            <Grid item xs={12}>
-                                                <Typography variant="body1"><strong>Name:</strong> {selectedDonation.ngoDetails.name}</Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <Typography variant="body1"><Email sx={{ verticalAlign: "middle" }} /> <strong>Email:</strong> {selectedDonation.ngoDetails.email}</Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <Typography variant="body1"><Phone sx={{ verticalAlign: "middle" }} /> <strong>Phone:</strong> {selectedDonation.ngoDetails.phone}</Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </>
-                                )}
-                            </Box>
-                        )}
-                    </DialogContent>
-                    <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-                        <Button variant="contained" color="primary" onClick={() => setDonationDialogOpen(false)}>Close</Button>
-                    </DialogActions>
-                </Dialog>
+                <DonationDetailDialog
+                    open={donationDialogOpen}
+                    onClose={() => setDonationDialogOpen(false)}
+                    selectedDonation={selectedDonation}
+                />
 
             </div>
         </Layout>
