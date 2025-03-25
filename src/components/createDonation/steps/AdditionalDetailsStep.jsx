@@ -7,12 +7,12 @@ const AdditionalDetailsStep = ({
     handleNextStep,
     errors,
 }) => (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
         <Typography variant="h5" color="blue-gray" className="mb-4">
             Contact Information
         </Typography>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
             <div>
                 <Input
                     type="date"
@@ -45,7 +45,7 @@ const AdditionalDetailsStep = ({
             </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
             <div>
                 <Input
                     type="email"
@@ -93,11 +93,11 @@ const AdditionalDetailsStep = ({
             </Typography>
         )}
 
-        <div className="flex justify-between pt-4">
-            <Button variant="outlined" onClick={handlePreviousStep}>
+        <div className="flex flex-col md:flex-row justify-between gap-2 pt-4">
+            <Button variant="outlined" onClick={handlePreviousStep} className="w-full md:w-auto">
                 Back
             </Button>
-            <Button onClick={handleNextStep} color="blue">
+            <Button onClick={handleNextStep} color="blue" className="w-full md:w-auto">
                 Next
             </Button>
         </div>

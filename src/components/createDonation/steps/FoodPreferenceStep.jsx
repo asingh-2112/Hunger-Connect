@@ -19,7 +19,7 @@ const FoodPreferenceStep = ({ formData, handleInputChange, handleNextStep, error
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
             <div>
                 <Typography variant="h6" color="blue-gray" className="mb-3">
                     Food Preference
@@ -69,7 +69,7 @@ const FoodPreferenceStep = ({ formData, handleInputChange, handleNextStep, error
                 <Typography variant="h6" color="blue-gray" className="mb-3">
                     Food Quantity (in Kgs)
                 </Typography>
-                <div className="w-1/3">
+                <div className="w-full md:w-1/3">
                     <Input
                         type="number"
                         name="quantity"
@@ -89,7 +89,7 @@ const FoodPreferenceStep = ({ formData, handleInputChange, handleNextStep, error
             </div>
 
             <div className="flex justify-end">
-                <Button onClick={handleNextStep} color="blue">
+                <Button onClick={handleNextStep} color="blue" className="w-full md:w-auto">
                     Next
                 </Button>
             </div>

@@ -7,7 +7,7 @@ const MessageStep = ({
     handleSubmit,
     errors,
 }) => (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
         <Typography variant="h5" color="blue-gray" className="mb-4">
             Final Details
         </Typography>
@@ -25,11 +25,11 @@ const MessageStep = ({
             </Typography>
         )}
 
-        <div className="flex justify-between pt-4">
-            <Button variant="outlined" onClick={handlePreviousStep}>
+        <div className="flex flex-col md:flex-row justify-between gap-2 pt-4">
+            <Button variant="outlined" onClick={handlePreviousStep} className="w-full md:w-auto">
                 Back
             </Button>
-            <Button onClick={handleSubmit} color="green">
+            <Button onClick={handleSubmit} color="green" className="w-full md:w-auto">
                 Submit Donation
             </Button>
         </div>

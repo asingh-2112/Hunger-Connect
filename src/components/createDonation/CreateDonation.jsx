@@ -328,7 +328,7 @@ const CreateDonation = ({ open, setOpen }) => {
             size="lg"
             className="rounded-lg"
         >
-            <DialogBody className="p-6 bg-gradient-to-br from-gray-50 to-white">
+            <DialogBody className="p-4 md:p-6 bg-gradient-to-br from-gray-50 to-white">
                 <div className="flex justify-between items-center mb-6">
                     <Typography variant="h4" color="blue-gray" className="font-bold">
                         Food Donation Form
@@ -344,10 +344,10 @@ const CreateDonation = ({ open, setOpen }) => {
                 </div>
                 
                 {/* Progress Steps */}
-                <div className="flex justify-between mb-8">
+                <div className="flex justify-between mb-6 px-2">
                     {[1, 2, 3, 4].map((stepNumber) => (
                         <div key={stepNumber} className="flex flex-col items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
                                 step === stepNumber ? 
                                 'bg-blue-500 text-white' : 
                                 step > stepNumber ? 
@@ -359,7 +359,7 @@ const CreateDonation = ({ open, setOpen }) => {
                             <Typography 
                                 variant="small" 
                                 color={step >= stepNumber ? "blue-gray" : "gray"} 
-                                className={`mt-2 ${step === stepNumber ? 'font-bold' : ''}`}
+                                className={`mt-1 text-xs md:text-sm ${step === stepNumber ? 'font-bold' : ''}`}
                             >
                                 Step {stepNumber}
                             </Typography>
@@ -368,7 +368,7 @@ const CreateDonation = ({ open, setOpen }) => {
                 </div>
 
                 {/* Form Steps */}
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
                     {/* Step 1: Food Preference */}
                     {step === 1 && (
                         <FoodPreferenceStep
