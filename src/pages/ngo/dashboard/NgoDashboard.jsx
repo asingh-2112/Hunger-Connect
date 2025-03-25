@@ -247,7 +247,7 @@ function NgoDashboard() {
                 </Card>
 
                 {/* Donations Section with colorful cards */}
-                <Card className={`rounded-xl shadow-lg  bg-gradient-to-br from-gray-50 to-gray-100 ${
+                <Card className={`rounded-xl shadow-lg max-w-7xl mx-auto bg-gradient-to-br from-gray-50 to-gray-100 ${
                     mode === 'dark' ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' : 
                     'bg-gradient-to-br from-white to-blue-50 border border-blue-100'
                 }`}>
