@@ -100,6 +100,7 @@ const DonationList = () => {
                     city: donationData.city,
                     date: donationData.date,
                     foodType: donationData.foodType,
+                    quantity: donationData.quantity,
                 }),
             });
 
@@ -120,31 +121,32 @@ const DonationList = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-6 mb-8 border border-blue-100">
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 mb-8 border border-blue-100">
+                <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4 sm:mb-6">
                     Available Donations
                 </h1>
                 
-                {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
+                {/* Filters - Adjusted for mobile */}
+                <div className="flex flex-col space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 gap-4 mb-6">
+                    <div className="w-full">
                         <Input
                             type="text"
                             label="Search by City"
                             value={cityFilter}
                             onChange={(e) => setCityFilter(e.target.value)}
-                            className=" !bg-white"
-                            containerProps={{ className: "min-w-[100px]" }}
+                            className="!bg-white"
+                            containerProps={{ className: "min-w-0" }} // Changed to min-w-0 to prevent overflow
                             color="purple"
                         />
                     </div>
-                    <div>
+                    <div className="w-full">
                         <Select
                             label="Food Preference"
                             value={foodFilter}
                             onChange={(val) => setFoodFilter(val)}
                             className="!bg-white"
                             color="purple"
+                            containerProps={{ className: "min-w-0" }} // Added containerProps
                         >
                             <Option value="" className="hover:bg-purple-50">All</Option>
                             <Option value="Veg" className="hover:bg-green-50">Veg</Option>
@@ -180,16 +182,16 @@ const DonationList = () => {
                         <table className="min-w-full divide-y divide-blue-100">
                             <thead className="bg-gradient-to-r from-blue-500 to-purple-500">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                         City
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                         Food Type
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Quantity (Kgs)
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Quantity
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -201,7 +203,7 @@ const DonationList = () => {
                                         className="hover:bg-blue-50/50 cursor-pointer transition-all duration-200"
                                         onClick={() => handleRowClick(donation)}
                                     >
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                                                     <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -215,7 +217,7 @@ const DonationList = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-900">
                                                 {donation.foodType?.join(", ")} 
                                                 <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
@@ -226,23 +228,23 @@ const DonationList = () => {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 h-4 w-4 bg-purple-200 rounded-full mr-2"></div>
                                                 <div className="text-sm font-bold text-purple-700">{donation.quantity} kg</div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             {donation.status === "Pending" ? (
                                                 <Button
                                                     onClick={(e) => acceptDonation(e, donation.id)}
-                                                    className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                                                    className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-xs sm:text-sm"
                                                     ripple={false}
                                                 >
-                                                    Accept Donation
+                                                    Accept
                                                 </Button>
                                             ) : (
-                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-200">
+                                                <span className="inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-200">
                                                     <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-600" fill="currentColor" viewBox="0 0 8 8">
                                                         <circle cx={4} cy={4} r={3} />
                                                     </svg>

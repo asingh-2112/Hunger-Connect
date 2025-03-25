@@ -141,13 +141,14 @@ function DonorDashboard() {
 
     return (
         <Layout>
-            <div className="py-8 px-4 max-w-7xl mx-auto" style={{ 
-                background: mode === 'dark' ? 
-                'radial-gradient(circle at top right, #1e293b, #0f172a)' : 
-                'radial-gradient(circle at top right, #f0f9ff, #e0f2fe)'
-            }}>
+            <div className="py-8 px-4 max-w-full mx-auto " >
                 {/* Profile Section with vibrant colors */}
-                <Card className={`p-6 mb-8 rounded-xl shadow-lg ${
+                <Card 
+                sx={{
+                    backgroundColor: mode === 'dark' ? '#14532d' : '#e0e0e0',
+                    
+                }}
+                className={`p-6 mb-8 rounded-xl shadow-lg shadow-sm bg-gradient-to-r from-teal-50 to-green-50 ${
                     mode === 'dark' ? 
                     'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' : 
                     'bg-gradient-to-br from-white to-blue-50 border border-blue-100'
@@ -157,13 +158,13 @@ function DonorDashboard() {
                             <FaUserCircle className="text-4xl text-white" />
                         </Avatar>
                         <div className="flex-1 text-center md:text-left">
-                            <Typography variant="h4" className="font-bold text-gray-800 dark:text-white">
+                            <Typography variant="h4" className="font-bold text-black-800 dark:text-white">
                                 {userData.name}
                             </Typography>
                             <Typography variant="subtitle1" className="text-blue-600 dark:text-blue-300">
                                 {userData.donorType} Donor
                             </Typography>
-                            <Typography variant="body2" className="mt-1 text-gray-600 dark:text-gray-300">
+                            <Typography variant="body2" className="mt-1 text-gray-800 dark:text-gray-300">
                                 {userData.email}
                             </Typography>
                         </div>
@@ -171,7 +172,7 @@ function DonorDashboard() {
                             <Link to="/createblog">
                                 <Button 
                                     variant="gradient" 
-                                    color="blue"
+                                    color="teal"
                                     className="flex items-center gap-2 shadow-md"
                                     startIcon={<Article />}
                                 >
@@ -181,16 +182,14 @@ function DonorDashboard() {
                             <Button 
                                 variant="gradient" 
                                 color="red" 
-                                className="flex items-center gap-2 shadow-md"
+                                className="flex justify-center items-center gap-2 w-full shadow-md"
                                 onClick={logout}
-                                startIcon={<FiLogOut />}
                             >
-                                Logout
+                                <span className="text-center w-full">Logout</span>
                             </Button>
+                        
                         </div>
                     </div>
-                    
-                    <Divider className="my-4" />
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                         <div className="p-3 rounded-lg bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 shadow-sm">
@@ -230,12 +229,12 @@ function DonorDashboard() {
                 </Card>
 
                 {/* Donations Section with colorful cards */}
-                <Card className={`rounded-xl shadow-lg ${
+                <Card className={`rounded-xl shadow-lg bg-gradient-to-br from-gray-50 to-gray-100${
                     mode === 'dark' ? 
                     'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' : 
                     'bg-gradient-to-br from-white to-blue-50 border border-blue-100'
                 }`}>
-                    <div className="p-6">
+                    <div className="p-6 bg-gray-300">
                         <Typography variant="h5" className={`font-bold mb-4 ${
                             mode === 'dark' ? 'text-blue-300' : 'text-blue-600'
                         }`}>
@@ -276,7 +275,17 @@ function DonorDashboard() {
                                     >
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                             <div className="flex items-center gap-4">
-                                                <Avatar className={`${
+                                                <Avatar 
+                                               sx={{
+                                                    backgroundColor:
+                                                        donation.status === 'Pending'
+                                                            ? '#f9a825' // Yellow for Pending
+                                                            : donation.status === 'Accepted'
+                                                            ? (mode === 'dark' ? '#14532d' : '#388e3c') // Green for Accepted
+                                                            : (mode === 'dark' ? '#1e293b' : '#e0e0e0'), // Default color
+                                                    color: mode === 'dark' ? '#000000' : '#ffffff', 
+                                                }}
+                                                className={`${
                                                     donation.status === 'Accepted' ? 'bg-green-100 text-green-800' :
                                                     donation.status === 'Rejected' ? 'bg-red-100 text-red-800' :
                                                     'bg-yellow-100 text-yellow-800'
@@ -287,14 +296,15 @@ function DonorDashboard() {
                                                     <Typography variant="subtitle1" className="font-medium text-gray-800 dark:text-white">
                                                         {donation.city || "N/A"}
                                                     </Typography>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <Event fontSize="small" className="text-gray-500 dark:text-gray-400" />
-                                                        <Typography variant="body2" className="text-gray-600 dark:text-gray-300">
+                                                    <div className="flex items-center justify-center flex-grow">
+                                                        <Event fontSize="small" className="  text-brown-500 dark:text-gray-400" />
+                                                        <Typography variant="body2" className="text-gray-800 dark:text-gray-300">
                                                             {donation.date} • {donation.time}
                                                         </Typography>
                                                     </div>
                                                 </div>
                                             </div>
+
                                             
                                             <div className="flex items-center gap-4">
                                                 <div className="flex items-center gap-2">

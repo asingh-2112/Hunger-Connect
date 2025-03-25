@@ -4,11 +4,8 @@ import { Button } from "@material-tailwind/react";
 import { doc, onSnapshot, updateDoc, arrayRemove, collection, getDoc } from "firebase/firestore";
 import { fireDb } from "../../../firebase/FirebaseConfig";
 import { Link, useNavigate } from "react-router-dom";
-import myContext from "../../../context/data/myContext";
-import { FiLogOut, FiPlusCircle, FiTrash2 } from "react-icons/fi"; 
+import myContext from "../../../context/data/myContext"; 
 import { FaUserCircle } from "react-icons/fa";
-import PlusButton from "../../../components/plusButton/PlusButton";
-import CreateDonation from "../../../components/createDonation/CreateDonation";
 import { toast } from "react-hot-toast";
 import SearchButton from "../../../components/searchButton/SearchButton";
 import DonationDetailDialog from "../../../components/donationDetailDialog/DonationDetailDialog";
@@ -156,9 +153,17 @@ function NgoDashboard() {
 
     return (
         <Layout>
-            <div className="py-8 px-4 max-w-7xl mx-auto">
+            <div className="py-8 px-4 max-w-full mx-auto  ">
                 {/* Profile Section with vibrant colors */}
-                <Card className={`p-6 mb-8 rounded-xl shadow-sm bg-gradient-to-r from-teal-50 to-green-50 ${mode === 'dark' ? 'from-gray-800 to-gray-900' : ''}`}>
+                <Card 
+                sx={{
+                    backgroundColor: mode === 'dark' ? '#14532d' : '#e0e0e0',
+                    
+                }}
+                className={`p-6 mb-8 rounded-xl shadow-sm bg-gradient-to-r from-teal-50 to-green-50 ${
+                    mode === 'dark' ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' : 
+                    'bg-gradient-to-br from-white to-blue-50 border border-blue-100'
+                }`}>
                     <div className="flex flex-col md:flex-row items-center gap-6">
                         <Badge
                             overlap="circular"
@@ -172,13 +177,13 @@ function NgoDashboard() {
                             </Avatar>
                         </Badge>
                         <div className="flex-1 text-center md:text-left">
-                            <Typography variant="h4" className="font-bold text-gray-800 dark:text-white">
+                            <Typography variant="h4" className="font-bold text-black-800 dark:text-white">
                                 {userData.name}
                             </Typography>
                             <Typography variant="subtitle1" className="text-teal-600 dark:text-teal-300">
                                 {userData.organizationType} Organization
                             </Typography>
-                            <Typography variant="body2" className="mt-1 text-gray-600 dark:text-gray-300">
+                            <Typography variant="body2" className="mt-1 text-gray-800 dark:text-gray-300">
                                 {userData.email}
                             </Typography>
                         </div>
@@ -196,16 +201,14 @@ function NgoDashboard() {
                             <Button 
                                 variant="gradient" 
                                 color="red" 
-                                className="flex items-center gap-2 shadow-md"
+                                className="flex justify-center items-center gap-2 w-full shadow-md"
                                 onClick={logout}
-                                startIcon={<FiLogOut />}
                             >
-                                Logout
+                                <span className="text-center w-full">Logout</span>
                             </Button>
+
                         </div>
                     </div>
-                    
-                    <Divider className="my-4" />
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                         <div className="p-3 rounded-lg bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 shadow-sm">
@@ -226,7 +229,7 @@ function NgoDashboard() {
                         </div>
                         <div className="p-3 rounded-lg bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 shadow-sm">
                             <Typography variant="h5" className="font-bold text-purple-800 dark:text-purple-100">
-                                {donations.reduce((sum, d) => sum + (d.quantity || 0), 0)} kg
+                                {donations.reduce((sum, d) => sum + (Number(d.quantity) || 0), 0)} kg
                             </Typography>
                             <Typography variant="body2" className="text-purple-600 dark:text-purple-300">
                                 Total Food
@@ -244,8 +247,11 @@ function NgoDashboard() {
                 </Card>
 
                 {/* Donations Section with colorful cards */}
-                <Card className={`rounded-xl shadow-sm bg-gradient-to-br from-gray-50 to-gray-100 ${mode === 'dark' ? 'from-gray-800 to-gray-900' : ''}`}>
-                    <div className="p-6">
+                <Card className={`rounded-xl shadow-lg  bg-gradient-to-br from-gray-50 to-gray-100 ${
+                    mode === 'dark' ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' : 
+                    'bg-gradient-to-br from-white to-blue-50 border border-blue-100'
+                }`}>
+                    <div className="p-6 bg-gray-300">
                         <div className="flex justify-between items-center mb-4">
                             <Typography variant="h5" className="font-bold text-gray-800 dark:text-white">
                                 Accepted Donations
@@ -271,31 +277,47 @@ function NgoDashboard() {
                         ) : (
                             <div className="space-y-4">
                                 {donations.map((donation, index) => (
-                                    <Card 
-                                        key={donation.id} 
-                                        className={`p-4 rounded-lg cursor-pointer transition-all hover:shadow-lg ${
-                                            mode === 'dark' ? 
-                                            'bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700' : 
-                                            'bg-gradient-to-r from-white to-gray-50 hover:from-teal-50 hover:to-white'
-                                        } border-l-4 border-green-500`}
-                                        onClick={() => openDetailDialog(donation)}
-                                    >
+                                <Card 
+                                    key={donation.id}
+                                    sx={{
+                                        backgroundColor: mode === 'dark' ? '#14532d' : '#fafafa', // Dark green in dark mode, light green in light mode
+                                        
+                                    }}
+                                    className={`p-4 rounded-lg cursor-pointer transition-all hover:shadow-lg ${
+                                        mode === 'dark' ? 
+                                        'bg-gradient-to-r from-gray-700 to-gray-200 hover:from-gray-600 hover:to-gray-700' : 
+                                        'bg-gradient-to-r from-white to-gray-50 hover:from-teal-50 hover:to-white'
+                                    } border-l-4 border-green-500`}
+                                    onClick={() => openDetailDialog(donation)}
+                                >
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                             <div className="flex items-center gap-4">
-                                                <Avatar className="bg-green-100 text-green-800">
+                                                <Avatar 
+                                                sx={{
+                                                    backgroundColor: mode === 'dark' ? '#14532d' : '#388e3c', // Dark green in dark mode, light green in light mode
+                                                    color: mode === 'dark' ? '#000000' : '#ffffff', // White in dark mode, light green in light mode
+                                                }}
+                                                className="bg-green-700 text-green-800">
                                                     {index + 1}
                                                 </Avatar>
                                                 <div>
-                                                    <Typography variant="subtitle1" className="font-medium text-gray-800 dark:text-white">
+                                                    <Typography variant="subtitle1" className="font-medium text-black-800 dark:text-white">
                                                         {donation.donorName || "Anonymous"}
                                                     </Typography>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <LocationOn fontSize="small" className="text-gray-500 dark:text-gray-400" />
-                                                        <Typography variant="body2" className="text-gray-600 dark:text-gray-300">
+                                                        <LocationOn fontSize="small" className="text-blue-800 dark:text-gray-400" />
+                                                        <Typography variant="body2" className="text-gray-800 dark:text-gray-300">
                                                             {donation.city}
                                                         </Typography>
                                                     </div>
                                                 </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-center flex-grow">
+                                                <Event fontSize="small" className="text-brown-500 mr-2" />
+                                                <Typography variant="body2" className="text-black-600">
+                                                    {donation.date || 'Date Not Available'}
+                                                </Typography>
                                             </div>
                                             
                                             <div className="flex items-center gap-4">

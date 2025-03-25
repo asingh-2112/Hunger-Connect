@@ -51,13 +51,6 @@ export default function Nav() {
                     Blogs
                 </Link>
             </li>
-            {(!storedUser || !userRole) && (
-                <li className="p-1 font-medium">
-                    <Link to={'/adminlogin'} className="flex items-center text-lg text-white hover:text-yellow-300 transition-colors duration-300">
-                        Sign In
-                    </Link>
-                </li>
-            )}
         </ul>
     );
 
