@@ -343,16 +343,7 @@ function NgoDashboard() {
                     </div>
                 </Card>
 
-                {/* Modals (keep existing functionality) */}
-                <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle>Available Donations</DialogTitle>
-                <DialogContent>
-                    <DonationList />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Close</Button>
-                </DialogActions>
-            </Dialog>
+                
                 
                 <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
                     <DialogTitle className="bg-gradient-to-r from-teal-500 to-green-600 text-white">
