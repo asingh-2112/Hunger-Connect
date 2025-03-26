@@ -148,7 +148,7 @@ function DonorDashboard() {
                     backgroundColor: mode === 'dark' ? '#14532d' : '#e0e0e0',
                     
                 }}
-                className={`p-6 mb-8 rounded-xl shadow-lg shadow-sm bg-gradient-to-r from-teal-50 to-green-50 ${
+                className={`p-6 mb-8 rounded-xl shadow-sm bg-gradient-to-r from-teal-50 to-green-50 ${
                     mode === 'dark' ? 
                     'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' : 
                     'bg-gradient-to-br from-white to-blue-50 border border-blue-100'
