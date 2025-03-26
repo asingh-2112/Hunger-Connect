@@ -251,7 +251,7 @@ const CreateDonation = ({ open, setOpen }) => {
             toast.error("User not found. Please log in again.");
             return;
         }
-        console.log(storedUser);
+        // console.log(storedUser);
     
         try {
             // Step 1: Add new donation to "donations" collection

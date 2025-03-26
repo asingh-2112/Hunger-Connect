@@ -142,15 +142,6 @@ function NgoDashboard() {
         }
     };
 
-    const getStatusColor = (status) => {
-        switch(status) {
-            case 'Pending': return 'warning';
-            case 'Accepted': return 'success';
-            case 'Rejected': return 'error';
-            default: return 'default';
-        }
-    };
-
     return (
         <Layout>
             <div className="py-8 px-4 max-w-full mx-auto  ">

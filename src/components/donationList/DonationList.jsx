@@ -224,7 +224,7 @@ const DonationList = () => {
                                                     ${donation.vegNonVeg === "Veg" ? 'bg-green-100 text-green-800 border border-green-200' : 
                                                     donation.vegNonVeg === "Non-Veg" ? 'bg-red-100 text-red-800 border border-red-200' : 
                                                     'bg-yellow-100 text-yellow-800 border border-yellow-200'}`}>
-                                                    {donation.vegNonVeg}
+                                                    {donation.vegNonVeg==="Both"?"Veg + Non-Veg" : donation.vegNonVeg}
                                                 </span>
                                             </div>
                                         </td>
