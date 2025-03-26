@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, fireDb } from "../../../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { Button, Input } from "@material-tailwind/react";
+import { Button, Dialog, Input } from "@material-tailwind/react";
 import { Eye, EyeOff } from "lucide-react";
 import LayoutRegLog from "../../../components/layoutRegLog/LayoutRegLog";
 
@@ -17,6 +17,9 @@ export default function AdminLogin() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [forgotPasswordDialog, setForgotPasswordDialog] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+
 
     const login = async () => {
         if (!email || !password) {
@@ -63,6 +66,19 @@ export default function AdminLogin() {
             toast.error("Login failed");
         }
     }
+
+    const handleForgotPassword = async () => {
+        if (!resetEmail) return toast.error("Please enter your email");
+
+        try {
+            await sendPasswordResetEmail(auth, resetEmail);
+            toast.success("Password reset email sent! Check your inbox.");
+            setForgotPasswordDialog(false);
+        } catch (error) {
+            toast.error("Error sending reset email. Check if the email is registered.");
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -128,6 +144,16 @@ export default function AdminLogin() {
                         Login
                     </Button>
 
+                    <div className="text-center text-sm">
+                            <button
+                                type="button"
+                                onClick={() => setForgotPasswordDialog(true)}
+                                className="text-blue-500 hover:underline"
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
+
                     {/* Register Option */}
                     <p className="text-center text-gray-600">
                         Don't have an account?{" "}
@@ -142,6 +168,25 @@ export default function AdminLogin() {
                 </form>
             </div>
         </div>
+        <Dialog open={forgotPasswordDialog} handler={() => setForgotPasswordDialog(false)}>
+                    <div className="p-6 space-y-4 bg-gray-900 text-white rounded-lg">
+                        <h3 className="text-xl font-semibold">Reset Password</h3>
+                        <Input
+                            type="email"
+                            label="Enter your email"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            className="w-full bg-gray-800 border-none text-white placeholder-gray-400 focus:ring-2 focus:ring-white"
+                            required
+                        />
+                        <Button
+                            onClick={handleForgotPassword}
+                            className="w-full bg-white text-gray-900 font-semibold py-2 rounded-lg shadow-lg hover:bg-gray-200 transition"
+                        >
+                            Send Reset Link
+                        </Button>
+                    </div>
+                </Dialog>
         </LayoutRegLog>
     );
 }
