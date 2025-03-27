@@ -75,7 +75,6 @@ export default function Nav() {
                     {navList}
 
                     <div className="flex items-center gap-4">
-                        <SearchDialog />
                         <ShareDialogBox />
 
                         {/* Theme Toggle */}
