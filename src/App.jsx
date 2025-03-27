@@ -22,8 +22,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import Register from './pages/register/Register';
 import CreateDonation from './components/createDonation/CreateDonation';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import CreateBlog from './pages/createBlog/createBlog';
-// import { auth, db, getDoc, doc } from './firebase'; 
+import CreateBlog from './pages/createBlog/CreateBlog';// import { auth, db, getDoc, doc } from './firebase'; 
 
 function App() {
   return (
