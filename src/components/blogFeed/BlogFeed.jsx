@@ -99,108 +99,108 @@ function BlogFeed() {
   };
 
   return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        {/* Modern Header */}
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
-            Community Stories
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Discover inspiring stories and updates from our food sharing community
-          </p>
-        </div>
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      {/* Modern Header - Made more compact */}
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          Community Stories
+        </h1>
+        <p className="text-md text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Discover inspiring stories
+        </p>
+      </div>
 
-        {/* Blog Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogs.map((blog, index) => (
-            <motion.div
-              key={blog.id}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
-            >
-              {/* User Header */}
-              <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Avatar 
-                    className="h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-500"
-                    src={blog.userPhoto}
-                  >
-                    {blog.userName?.charAt(0) || 'U'}
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {blog.userName}
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {blog.userRole}
-                    </p>
-                  </div>
-                </div>
-                <IconButton size="small" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                  <MoreHoriz fontSize="small" />
-                </IconButton>
-              </div>
-
-              {/* Blog Image */}
-              {blog.imageUrl && (
-                <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={blog.imageUrl}
-                    alt={blog.caption}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  />
-                </div>
-              )}
-
-              {/* Blog Content */}
-              <div className="p-4">
-                <p className="text-gray-700 dark:text-gray-300 mb-2">
-                  {blog.caption}
-                </p>
-                
-                {/* Date and Time */}
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                  {blog.formattedDate}
-                </p>
-                
-                {/* Engagement Bar */}
-                <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
-                  <button 
-                    onClick={() => handleLike(blog.id, blog.likedBy || [])}
-                    className={`flex items-center space-x-1 ${blog.likedBy?.includes(user?.uid) ? 'text-red-500' : 'text-gray-500 hover:text-red-500'} transition-colors`}
-                  >
-                    {blog.likedBy?.includes(user?.uid) ? (
-                      <Favorite className="text-red-500" />
-                    ) : (
-                      <FavoriteBorder />
-                    )}
-                    <span className="text-sm">{blog.likes || 0}</span>
-                  </button>
-
-                  <button 
-                    onClick={() => {
-                      setSelectedBlog(blog);
-                      setOpenComments(true);
-                    }}
-                    className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
-                  >
-                    <ChatBubbleOutline fontSize="small" />
-                    <span className="text-sm">{blog.comments?.length || 0}</span>
-                  </button>
-
-                  <button className="text-gray-500 hover:text-purple-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                  </button>
+      {/* Blog Posts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {blogs.map((blog, index) => (
+          <motion.div
+            key={blog.id}
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+          >
+            {/* Compact User Header */}
+            <div className="p-3 flex items-center justify-between bg-blue-50 dark:bg-gray-700">
+              <div className="flex items-center space-x-2">
+                <Avatar 
+                  className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500"
+                  src={blog.userPhoto}
+                >
+                  {blog.userName?.charAt(0) || 'U'}
+                </Avatar>
+                <div>
+                  <h3 className="text-sm font-medium font-semibold text-gray-900 dark:text-white">
+                    {blog.userName}
+                  </h3>
+                  <p className="text-xs text-brown-800  dark:text-gray-400 italic">
+                    {blog.userRole=="Provider"?"Food Provider":"Food Distributor"}
+                  </p>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
+              <IconButton size="small" className="!p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <MoreHoriz fontSize="small" />
+              </IconButton>
+            </div>
+
+            {/* Image with more space */}
+            {blog.imageUrl && (
+              <div className="relative h-48 w-full overflow-hidden">
+                <img
+                  src={blog.imageUrl}
+                  alt={blog.caption}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+            )}
+
+            {/* Compact Blog Content */}
+            <div className="p-3 bg-blue-50 dark:bg-gray-700">
+              <p className="text-sm text-purple-800 dark:text-gray-300 mb-1 line-clamp-2">
+                {blog.caption}
+              </p>
+              
+              {/* Small Date */}
+              <p className="text-xs text-black-500 dark:text-gray-400 mb-2">
+                {blog.formattedDate}
+              </p>
+              
+              {/* Compact Engagement Bar */}
+              <div className="flex items-center justify-between pt-2">
+                <button 
+                  onClick={() => handleLike(blog.id, blog.likedBy || [])}
+                  className={`flex items-center space-x-1 ${blog.likedBy?.includes(user?.uid) ? 'text-red-500' : 'text-gray-500 hover:text-red-500'} transition-colors`}
+                >
+                  {blog.likedBy?.includes(user?.uid) ? (
+                    <Favorite className="text-red-500 " />
+                  ) : (
+                    <FavoriteBorder className="text-brown-500 " />
+                  )}
+                  <span className="text-lg text-brown-500">{blog.likes || 0}</span>
+                </button>
+
+                <button 
+                  onClick={() => {
+                    setSelectedBlog(blog);
+                    setOpenComments(true);
+                  }}
+                  className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
+                >
+                  <ChatBubbleOutline className="text-brown-500 " />
+                  <span className="text-lg text-brown-500">{blog.comments?.length || 0}</span>
+                </button>
+
+                <button className="text-brown-500 hover:text-purple-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
         {blogs.length === 0 && (
           <div className="text-center py-16">

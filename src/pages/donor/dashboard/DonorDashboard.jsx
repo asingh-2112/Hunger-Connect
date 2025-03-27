@@ -20,12 +20,9 @@ import {
   DialogActions,
   Chip,
   Avatar,
-  Divider
 } from "@mui/material";
-import { 
-  LocationOn, 
+import {  
   Event, 
-  AccessTime, 
   Fastfood,
   Delete,
   Article,

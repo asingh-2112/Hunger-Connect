@@ -48,8 +48,8 @@ export default function Home() {
   return (
     <Layout>
       {/* Image Carousel Section */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-8 px-6 sm:px-6 lg:px-8">
+        <div className="max-w-full mx-auto">
           <ImageCarousel slides={slides} />
         </div>
       </section>

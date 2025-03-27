@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { fireDb, storage } from "../../../firebase/FirebaseConfig";
 import { useNavigate } from "react-router-dom";
 import myContext from "../../../context/data/myContext";
@@ -58,7 +58,6 @@ function CreateBlog() {
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           const user = JSON.parse(localStorage.getItem("user"));
-          console.log(user);
 
           const blogData = {
             caption,
@@ -79,10 +78,17 @@ function CreateBlog() {
             })
           };
 
-          await addDoc(collection(fireDb, "blogs"), blogData);
+          // Add the blog document and get its reference
+            const blogRef = await addDoc(collection(fireDb, "blogs"), blogData);
+            
+            // Update the user document to include the new blog ID
+            const userRef = doc(fireDb, "users", user.uid);
+            await updateDoc(userRef, {
+            blogs: arrayUnion(blogRef.id) // This adds the blog ID to the user's blogs array
+            });
           toast.success("Blog published successfully!");
           setLoading(false);
-          navigate("/blogs");
+          navigate("/");
         }
       );
     } catch (error) {
@@ -99,11 +105,11 @@ function CreateBlog() {
           {/* Header with back button */}
           <div className="flex items-center mb-8">
             <button 
-              onClick={() => navigate("/blogs")}
+              onClick={() => navigate("/")}
               className={`flex items-center space-x-2 ${mode === 'dark' ? 'text-white' : 'text-gray-700'} hover:text-blue-500 transition-colors`}
             >
               <FiArrowLeft className="text-xl" />
-              <span className="font-medium">Back to Blogs</span>
+              <span className="font-medium">Back to Home</span>
             </button>
           </div>
 
@@ -201,7 +207,7 @@ function CreateBlog() {
                 <Button
                   variant="text"
                   color={mode === 'dark' ? 'gray' : 'blue-gray'}
-                  onClick={() => navigate("/blogs")}
+                  onClick={() => navigate("/")}
                   disabled={loading}
                   className="flex items-center space-x-1"
                 >
