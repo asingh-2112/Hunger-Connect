@@ -43,7 +43,7 @@ export default function AdminLogin() {
                 localStorage.setItem("user", JSON.stringify({
                     uid: result.user.uid,
                     email: result.user.email,
-                    name: userData.name,
+                    name: userData.name || userData.organizationName,
                     role: userData.role
                 }));
 

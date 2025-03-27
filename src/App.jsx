@@ -14,7 +14,7 @@ import Dashboard from './pages/admin/dashboard/Dashboard';
 import Nopage from './pages/nopage/Nopage';
 import MyState from './context/data/myState';
 import { Toaster } from 'react-hot-toast';
-import CreateBlog from './pages/admin/createBlog/createBlog';
+import CreateBlog from './pages/admin/createBlog/CreateBlog';
 import DonorDashboard from './pages/donor/dashboard/DonorDashboard';  // Add donor dashboard
 import NgoDashboard from './pages/ngo/dashboard/NgoDashboard'; // Add NGO dashboard
 import { auth, fireDb } from './firebase/FirebaseConfig';
@@ -46,7 +46,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/createblog" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
+              <ProtectedRoute allowedRoles={["admin","provider","distributor"]}>
                 <CreateBlog />
               </ProtectedRoute>
             } />

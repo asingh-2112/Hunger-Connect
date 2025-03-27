@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Layout from '../../components/layout/Layout'
 import HeroSection from '../../components/heroSection/HeroSection'
-import BlogPostCard from '../../components/blogPostCard/BlogPostCard'
+import BlogPostCard from '../../components/blogFeed/BlogFeed'
 import PlusButton from '../../components/plusButton/PlusButton';
 import CreateDonation from '../../components/createDonation/CreateDonation';
 import ImageCarousel from '../../components/imageCarousel/ImageCarousel';
 import SearchButton from '../../components/searchButton/SearchButton';
+import BlogFeed from '../../components/blogFeed/BlogFeed';
 
 export default function Home() {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -52,7 +53,7 @@ export default function Home() {
           <ImageCarousel slides={slides} />
         </div>
       </section>
-      <BlogPostCard/>
+      <BlogFeed/>
       
       {/* Action Buttons based on User Role */}
       <div className="fixed bottom-8 right-8 z-50">

@@ -1,191 +1,259 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { BsFillArrowLeftCircleFill } from "react-icons/bs";
-import myContext from '../../../context/data/myContext';
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Typography } from "@material-tailwind/react";
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
-import toast from 'react-hot-toast';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { fireDb, storage } from '../../../firebase/FirebaseConfig';
+import React, { useState, useContext } from "react";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { fireDb, storage } from "../../../firebase/FirebaseConfig";
+import { useNavigate } from "react-router-dom";
+import myContext from "../../../context/data/myContext";
+import { toast } from "react-hot-toast";
+import { Button, Textarea } from "@material-tailwind/react";
+import Layout from "../../../components/layout/Layout";
+import { FiUpload, FiX, FiArrowLeft } from "react-icons/fi";
 
 function CreateBlog() {
-    const context = useContext(myContext);
-    const { mode } = context;
+  const [caption, setCaption] = useState("");
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const context = useContext(myContext);
+  const { mode } = context;
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-    const [blogs, setBlogs] = useState({
-        title: '',
-        category: '',
-        content: '',
-        time: Timestamp.now(),
-    });
-    const [thumbnail, setThumbnail] = useState(null);
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
-    const addPost = async () => {
-        if (blogs.title === "" || blogs.category === "" || blogs.content === "" || blogs.thumbnail === "") {
-            toast.error('Please Fill All Fields');
+  const removeImage = () => {
+    setImage(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (!image) {
+        toast.error("Please select an image");
+        setLoading(false);
+        return;
+      }
+
+      const storageRef = ref(storage, `blogs/${image.name + Date.now()}`);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+        },
+        (error) => {
+          console.error(error);
+          toast.error("Error uploading image");
+          setLoading(false);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          const user = JSON.parse(localStorage.getItem("user"));
+          console.log(user);
+
+          const blogData = {
+            caption,
+            imageUrl: downloadURL,
+            createdAt: serverTimestamp(),
+            createdBy: user.uid,
+            userName: user.organizationName || user.name || "Anonymous",
+            userRole: user.role || user.organizationType || "NGO",
+            likes: 0,
+            likedBy: [],
+            comments: [],
+            formattedDate: new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          };
+
+          await addDoc(collection(fireDb, "blogs"), blogData);
+          toast.success("Blog published successfully!");
+          setLoading(false);
+          navigate("/blogs");
         }
-        // console.log(blogs.content)
-        uploadImage()
+      );
+    } catch (error) {
+      console.error("Error publishing blog:", error);
+      toast.error("Failed to publish blog");
+      setLoading(false);
     }
+  };
 
-    const uploadImage = () => {
-        if (!thumbnail) return;
-        const imageRef = ref(storage, `blogimage/${thumbnail.name}`);
-        uploadBytes(imageRef, thumbnail).then((snapshot) => {
-            getDownloadURL(snapshot.ref).then((url) => {
-                const productRef = collection(fireDb, "blogPost")
-                try {
-                    addDoc(productRef, {
-                        blogs,
-                        thumbnail: url,
-                        time: Timestamp.now(),
-                        date: new Date().toLocaleString(
-                            "en-US",
-                            {
-                                month: "short",
-                                day: "2-digit",
-                                year: "numeric",
-                            }
-                        )
-                    })
-                    navigate('/dashboard')
-                    toast.success('Post Added Successfully');
+  return (
+    <Layout>
+      <div className={`min-h-screen py-8 px-4 ${mode === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className="max-w-3xl mx-auto">
+          {/* Header with back button */}
+          <div className="flex items-center mb-8">
+            <button 
+              onClick={() => navigate("/blogs")}
+              className={`flex items-center space-x-2 ${mode === 'dark' ? 'text-white' : 'text-gray-700'} hover:text-blue-500 transition-colors`}
+            >
+              <FiArrowLeft className="text-xl" />
+              <span className="font-medium">Back to Blogs</span>
+            </button>
+          </div>
 
-
-                } catch (error) {
-                    toast.error(error)
-                    console.log(error)
-                }
-            });
-        });
-    }
-
-    // const savePost = async (imageUrl) => {
-    //     const productRef = collection(fireDb, "blogPost");
-    //     try {
-    //         await addDoc(productRef, {
-    //             ...blogs,
-    //             thumbnail: imageUrl,
-    //             time: Timestamp.now(),
-    //             date: new Date().toLocaleString("en-US", {
-    //                 month: "short",
-    //                 day: "2-digit",
-    //                 year: "numeric",
-    //             }),
-    //         });
-    //         navigate('/dashboard');
-    //         toast.success('Post Added Successfully');
-    //     } catch (error) {
-    //         toast.error(error.message);
-    //         console.log(error);
-    //     }
-    // };
-
-    const [text, settext] = useState('');
-
-    useEffect(() => {
-        window.scrollTo(0, 0)
-    }, [])
-
-    return (
-        <div className='container mx-auto max-w-5xl py-6'>
-            <div className="p-5"
-                style={{
-                    background: mode === 'dark' ? '#353b48' : 'rgb(226, 232, 240)',
-                    borderBottom: mode === 'dark' ? '4px solid rgb(226, 232, 240)' : '4px solid rgb(30, 41, 59)'
-                }}>
-                {/* Header */}
-                <div className="mb-2 flex justify-between">
-                    <div className="flex gap-2 items-center">
-                        <Link to={'/dashboard'}>
-                            <BsFillArrowLeftCircleFill size={25} />
-                        </Link>
-                        <Typography variant="h4" style={{ color: mode === 'dark' ? 'white' : 'black' }}>
-                            Create Blog
-                        </Typography>
-                    </div>
-                </div>
-
-                {/* Thumbnail Upload */}
-                <div className="mb-3">
-                    {thumbnail && (
-                        <img className="w-full rounded-md mb-3"
-                        src={thumbnail
-                            ? URL.createObjectURL(thumbnail)
-                            : ""}
-                        alt="thumbnail"
-                        />
-                    )}
-                    <Typography variant="small" className="mb-2 font-semibold"
-                        style={{ color: mode === 'dark' ? 'white' : 'black' }}>
-                        Upload Thumbnail
-                    </Typography>
-                    <input type="file"
-                        className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] placeholder-black w-full rounded-md p-1"
-                        style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
-                        onChange={(e) => setThumbnail(e.target.files[0])}
-                    />
-                </div>
-
-                {/* Title Input */}
-                <div className="mb-3">
-                    <input className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 outline-none"
-                        placeholder="Enter Your Title"
-                        style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
-                        name="title"
-                        value={blogs.title}
-                        onChange={(e) => setBlogs({ ...blogs, title: e.target.value })}
-                    />
-                </div>
-
-                {/* Category Input */}
-                <div className="mb-3">
-                    <input className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 outline-none"
-                        placeholder="Enter Your Category"
-                        style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
-                        name="category"
-                        value={blogs.category}
-                        onChange={(e) => setBlogs({ ...blogs, category: e.target.value })}
-                    />
-                </div>
-
-                {/* Content Input */}
-                <div className="mb-3">
-                    <textarea className="shadow-[inset_0_0_4px_rgba(0,0,0,0.6)] w-full rounded-md p-1.5 outline-none"
-                        placeholder="Enter Your Content"
-                        style={{ background: mode === 'dark' ? '#dcdde1' : 'rgb(226, 232, 240)' }}
-                        name='content'
-                        value={blogs.content}
-                        onChange={(e) => setBlogs({ ...blogs, content: e.target.value })}
-                    />
-                </div>
-
-                {/* Submit Button */}
-                <Button className="w-full mt-5"
-                    onClick={addPost}
-                    style={{
-                        background: mode === 'dark' ? 'rgb(226, 232, 240)' : 'rgb(30, 41, 59)',
-                        color: mode === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(226, 232, 240)'
-                    }}>
-                    Publish
-                </Button>
-
-                {/* Preview Section */}
-                <div className="mt-6">
-                    <h1 className="text-center mb-3 text-2xl">Preview</h1>
-                    <div className="content">
-                        <h2 className={`text-xl font-bold ${mode === 'dark' ? 'text-white' : 'text-black'}`}>
-                            {blogs.title}
-                        </h2>
-                        <p className={`text-lg ${mode === 'dark' ? 'text-[#7efff5]' : 'text-black'}`}>
-                            {blogs.content}
-                        </p>
-                    </div>
-                </div>
+          {/* Main card */}
+          <div className={`rounded-xl shadow-lg overflow-hidden ${mode === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            {/* Card header */}
+            <div className={`p-6 border-b ${mode === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                Create New Post
+              </h1>
+              <p className={`mt-1 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Share your story with the community
+              </p>
             </div>
+
+            {/* Form content */}
+            <form onSubmit={handleSubmit} className="p-6">
+              {/* Image upload section */}
+              <div className="mb-8">
+                <label className={`block text-sm font-medium mb-3 ${mode === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Featured Image
+                </label>
+                
+                {!image ? (
+                  <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${mode === 'dark' ? 'border-gray-700 hover:border-blue-500' : 'border-gray-300 hover:border-blue-400'}`}>
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <FiUpload className={`text-3xl ${mode === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+                      <p className={`text-sm ${mode === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Drag & drop an image, or click to browse
+                      </p>
+                      <span className={`text-xs ${mode === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                        Recommended size: 1200x630 pixels
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        required
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <Button
+                        variant="outlined"
+                        size="sm"
+                        className="mt-2"
+                      >
+                        Select Image
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative group">
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Preview"
+                      className="w-full h-64 object-cover rounded-lg shadow-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-3 right-3 bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-100 transition-all"
+                    >
+                      <FiX className="text-lg" />
+                    </button>
+                    {progress > 0 && progress < 100 && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gray-200 h-1.5">
+                        <div
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 h-full rounded-full"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Caption section */}
+              <div className="mb-8">
+                <label className={`block text-sm font-medium mb-3 ${mode === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Your Story
+                </label>
+                <Textarea
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  placeholder="Share your thoughts, experiences, or news with the community..."
+                  className={`w-full !border ${mode === 'dark' ? '!border-gray-700 !bg-gray-800 focus:!border-blue-500' : '!border-gray-300 focus:!border-blue-400'} rounded-lg p-4`}
+                  rows={8}
+                />
+                <p className={`mt-2 text-xs ${mode === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                  Minimum 50 characters. Markdown supported.
+                </p>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="text"
+                  color={mode === 'dark' ? 'gray' : 'blue-gray'}
+                  onClick={() => navigate("/blogs")}
+                  disabled={loading}
+                  className="flex items-center space-x-1"
+                >
+                  <span>Cancel</span>
+                </Button>
+                <Button
+                  type="submit"
+                  color="blue"
+                  disabled={loading || !image}
+                  loading={loading}
+                  className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-purple-600 shadow-md hover:shadow-lg transition-all"
+                >
+                  {loading ? (
+                    <span>Publishing...</span>
+                  ) : (
+                    <>
+                      <span>Publish Now</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+
+          {/* Tips section */}
+          <div className={`mt-8 p-6 rounded-xl ${mode === 'dark' ? 'bg-gray-800' : 'bg-blue-50'} border ${mode === 'dark' ? 'border-gray-700' : 'border-blue-100'}`}>
+            <h3 className={`text-lg font-semibold mb-3 ${mode === 'dark' ? 'text-white' : 'text-blue-800'}`}>
+              Posting Tips
+            </h3>
+            <ul className={`space-y-2 text-sm ${mode === 'dark' ? 'text-gray-300' : 'text-blue-700'}`}>
+              <li className="flex items-start space-x-2">
+                <span className="mt-0.5">•</span>
+                <span>Use high-quality images that represent your content</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="mt-0.5">•</span>
+                <span>Tell a story - people engage more with personal experiences</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="mt-0.5">•</span>
+                <span>Keep it authentic and relevant to your cause</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="mt-0.5">•</span>
+                <span>Use proper formatting for readability</span>
+              </li>
+            </ul>
+          </div>
         </div>
-    );
+      </div>
+    </Layout>
+  );
 }
 
 export default CreateBlog;
