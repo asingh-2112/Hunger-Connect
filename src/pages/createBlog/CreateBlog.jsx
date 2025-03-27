@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { addDoc, arrayUnion, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { fireDb, storage } from "../../../firebase/FirebaseConfig";
+import { fireDb, storage } from "../../firebase/FirebaseConfig";
 import { useNavigate } from "react-router-dom";
-import myContext from "../../../context/data/myContext";
+import myContext from "../../context/data/myContext";
 import { toast } from "react-hot-toast";
 import { Button, Textarea } from "@material-tailwind/react";
-import Layout from "../../../components/layout/Layout";
+import Layout from "../../components/layout/Layout";
 import { FiUpload, FiX, FiArrowLeft } from "react-icons/fi";
 
 function CreateBlog() {

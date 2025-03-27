@@ -14,7 +14,7 @@ import Dashboard from './pages/admin/dashboard/Dashboard';
 import Nopage from './pages/nopage/Nopage';
 import MyState from './context/data/myState';
 import { Toaster } from 'react-hot-toast';
-import CreateBlog from './pages/admin/createBlog/CreateBlog';
+// import CreateBlog from 
 import DonorDashboard from './pages/donor/dashboard/DonorDashboard';  // Add donor dashboard
 import NgoDashboard from './pages/ngo/dashboard/NgoDashboard'; // Add NGO dashboard
 import { auth, fireDb } from './firebase/FirebaseConfig';
@@ -22,6 +22,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import Register from './pages/register/Register';
 import CreateDonation from './components/createDonation/CreateDonation';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import CreateBlog from './pages/createBlog/createBlog';
 // import { auth, db, getDoc, doc } from './firebase'; 
 
 function App() {
