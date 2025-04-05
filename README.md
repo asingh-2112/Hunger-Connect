@@ -100,13 +100,13 @@ Hunger-Connect/
 You can add GIFs or screenshots here showcasing:
 
 - ### Donation form
-  ![App Demo](./src/assets/cdGif.gif)
+  <img src="./src/assets/cdGif.gif" height="300"/>
 
 - ### Blog post flow
+  <img src="./src/assets/cbGif.gif" height="300"/>
 
 - ### NGO dashboard
-
-- ### Responsive layout
+  <img src="./src/assets/sdGif.gif" height="300"/>
 
 ---
 
