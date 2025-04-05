@@ -81,20 +81,32 @@ Hunger-Connect/
 ---
 
 ### 🧭 Application Flow
-Donor signs in → adds donation via form.
+1. Donor signs in → adds donation via form.
 
-NGO signs in → browses available donations → accepts a donation.
+2. NGO signs in → browses available donations → accepts a donation.
 
-NGO picks up food and can post a blog about the experience.
+3. NGO picks up food and can post a blog about the experience.
 
-Both users can interact through blog likes and comments.
+4. Both users can interact through blog likes and comments.
 
-Navbar provides quick access to donation history and blog feed.
+5. Navbar provides quick access to donation history and blog feed.
 
 ---
 
-### 🌍 Live Demo
+## 🌍 Live Demo
 🔗 https://hungerconnect.vercel.app
+
+## 📸 Screenshots
+You can add GIFs or screenshots here showcasing:
+
+- ### Donation form
+  ![App Demo](./src/assets/cdGif.gif)
+
+- ### Blog post flow
+
+- ### NGO dashboard
+
+- ### Responsive layout
 
 ---
 
